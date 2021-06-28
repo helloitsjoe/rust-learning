@@ -5,7 +5,15 @@
 // I AM NOT DONE
 
 fn main() {
-    let a = ???
+    // let a = {
+    //     let mut foo = Vec::new();
+    //     for num in 1..101 {
+    //         foo.push(num)
+    //     }
+    //     foo
+    // };
+
+    let a = ["Hello"; 101];
 
     if a.len() >= 100 {
         println!("Wow, that's a big array!");
