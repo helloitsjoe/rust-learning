@@ -39,14 +39,13 @@ impl From<&str> for Person {
             return Person::default();
         }
 
-        let name_and_age: Vec<_> = s.split(',').collect();
+        let name_and_age: Vec<&str> = s.splitn(2, ',').collect();
         let name = String::from(name_and_age[0]);
 
         if name.is_empty() || name_and_age.len() != 2 {
             return Person::default();
         };
 
-        // let age: usize;
         match name_and_age[1].parse::<usize>() {
             Ok(age) => Person { name, age },
             Err(_) => Person::default(),
