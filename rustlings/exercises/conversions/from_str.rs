@@ -26,6 +26,19 @@ struct Person {
 impl FromStr for Person {
     type Err = Box<dyn error::Error>;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        let split: Vec<&str> = s.split(',').collect();
+        if split.len() != 2 {
+            return Err("That's-a no good".into());
+        }
+
+        let name = String::from(split[0]);
+        let age = String::from(split[1]).parse::<usize>()?;
+
+        if name.len() == 0 {
+            return Err("That's-a no good".into());
+        }
+
+        Ok(Person { name, age })
     }
 }
 
