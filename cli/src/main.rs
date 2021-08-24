@@ -1,12 +1,13 @@
-use std::collections::VecDeque;
 use std::env;
 use std::io;
 
+mod blackjack;
+
 // TODO: Use a CLI argument parser
 fn main() {
-    let mut args: VecDeque<String> = env::args().collect();
-    // Remove filename from args
-    args.drain(..1);
+    let args_with_fn = env::args().collect::<Vec<String>>();
+    // Remove function from args
+    let args = &args_with_fn[1..];
 
     if args.len() == 0 {
         handle_user_input();
@@ -23,7 +24,8 @@ fn handle_user_input() {
 
     let input = get_input();
     if input == "1" {
-        println!("Blackjack!");
+        // println!("Blackjack!");
+        blackjack::start();
     } else {
         println!("You input: {}", input);
     }
