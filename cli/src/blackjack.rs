@@ -1,5 +1,11 @@
-// pub mod blackjack;
+pub struct Game;
 
-pub fn start() {
-  println!("Let's play!");
+impl Game {
+  pub fn new() -> Game {
+    Game
+  }
+
+  pub fn start(&self) {
+    println!("Let's play!");
+  }
 }
