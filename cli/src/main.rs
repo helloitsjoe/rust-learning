@@ -26,7 +26,7 @@ fn handle_user_input() {
     let input = get_input();
     if input == "1" {
         // println!("Blackjack!");
-        let game = Game::new(Deck::new(None));
+        let mut game = Game::new(Deck::new(None));
         game.start();
     } else {
         println!("You input: {}", input);

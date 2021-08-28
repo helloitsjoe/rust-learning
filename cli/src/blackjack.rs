@@ -1,7 +1,8 @@
-#[derive(std::fmt::Debug)]
+#[derive(Debug, Clone)]
 pub struct Deck {
   cards: Vec<Card>,
-  size: u32,
+  // size: u32,
+  initial_size: u32,
 }
 
 fn make_cards(length: u32) -> Vec<Card> {
@@ -13,31 +14,36 @@ fn make_cards(length: u32) -> Vec<Card> {
 
 impl Deck {
   pub fn new(default_size: Option<u32>) -> Deck {
-    let size = default_size.unwrap_or(10);
+    let initial_size = default_size.unwrap_or(10);
+
     // TODO: Card values and faces
     Deck {
-      cards: make_cards(size),
-      size,
+      cards: make_cards(initial_size),
+      // size: initial_size,
+      initial_size,
     }
   }
 
-  pub fn shuffle(&self) {
-    println!("{:?}", &self.cards);
+  pub fn shuffle(self) -> Deck {
+    println!("{:?}", self.cards);
     println!("Shuffling");
+    self
   }
 
   pub fn deal_one(&mut self) -> Card {
-    println!("Dealing one card");
-    if self.cards.len() > 0 {
-      self.cards.pop().unwrap()
-    } else {
-      self.cards = make_cards(self.size);
-      self.cards.pop().unwrap()
+    // println!("Dealing one card");
+    if self.cards.len() == 0 {
+      self.cards = make_cards(self.initial_size);
     }
+
+    let card = self.cards.pop().unwrap();
+    // self.size = self.cards.len() as u32;
+    println!("Cards in deck: {:?}", self.cards);
+    card
   }
 }
 
-#[derive(std::fmt::Debug)]
+#[derive(Debug, Clone)]
 pub struct Card {
   pub val: u32,
   // face: String,
@@ -58,7 +64,7 @@ impl Player {
     }
   }
 
-  pub fn deal(&self, deck: &Deck) {
+  pub fn deal(&mut self, deck: &mut Deck) {
     let player_or_dealer = {
       if self.is_dealer {
         "dealer"
@@ -67,8 +73,8 @@ impl Player {
       }
     };
     println!("Dealing {}", player_or_dealer);
-    // self.hand.push(deck.deal_one());
-    // self.hand.push(deck.deal_one());
+    self.hand.push(deck.deal_one());
+    self.hand.push(deck.deal_one());
     println!("{:?}", self.hand);
   }
 }
@@ -82,6 +88,7 @@ pub struct Game {
 
 impl Game {
   pub fn new(deck: Deck) -> Game {
+    // let deck = &mut deck;
     Game {
       num_players: 2,
       player: Player::new(false),
@@ -90,11 +97,12 @@ impl Game {
     }
   }
 
-  pub fn start(&self) {
+  pub fn start(&mut self) {
     println!("Let's play!");
-    &self.deck.shuffle();
-    &self.player.deal(&self.deck);
-    &self.dealer.deal(&self.deck);
+    // self.deck.shuffle();
+    let deck = &mut self.deck.clone().shuffle();
+    self.player.deal(deck);
+    self.dealer.deal(deck);
   }
 }
 
@@ -104,9 +112,12 @@ mod test_blackjack {
 
   #[test]
   fn test_construct() {
-    let game = Game::new(Deck::new(None));
+    let game = &mut Game::new(Deck::new(Some(10)));
     game.start();
     assert_eq!(game.num_players, 2);
+    assert_eq!(game.player.hand.len(), 2);
+    assert_eq!(game.dealer.hand.len(), 2);
+    assert_eq!(game.deck.cards.len(), 6);
   }
 
   #[test]
