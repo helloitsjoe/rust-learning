@@ -27,7 +27,6 @@ impl Deck {
   }
 
   pub fn deal_one(&mut self) -> Card {
-    println!("Dealing one card");
     if self.cards.len() == 0 {
       self.cards = make_cards(self.initial_size);
     }
@@ -93,7 +92,7 @@ pub struct Game {
 impl Game {
   pub fn new(deck: Deck) -> Game {
     Game {
-      num_players: 2,
+      num_players: 1,
       player: Player::new(false),
       dealer: Player::new(true),
       deck,
@@ -101,10 +100,29 @@ impl Game {
   }
 
   pub fn start(&mut self) {
-    println!("Let's play!");
+    println!("Let's play! {} players", self.num_players);
     &mut self.deck.clone().shuffle();
     self.player.deal(&mut self.deck);
     self.dealer.deal(&mut self.deck);
+    self.show_score();
+    println!("hit or stay?");
+  }
+
+  pub fn handle_input(&mut self, input: String) {
+    if input == "hit" {
+      self.player.hit(self.deck.deal_one());
+      self.show_score();
+    } else {
+      println!("You stayed.");
+      self.show_score();
+    }
+  }
+
+  fn show_score(&self) {
+    println!(
+      "You have {}, dealer shows {}",
+      self.player.total, self.dealer.total
+    );
   }
 }
 

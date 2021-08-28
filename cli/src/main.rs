@@ -15,19 +15,22 @@ fn main() {
     } else {
         for arg in args {
             println!("{}", arg);
+            println!("Currently doesn't support args. Run this program without args.");
         }
     }
 }
 
 fn handle_user_input() {
     println!("What would you like to do?");
-    println!("1 - Blackjack");
+    println!("1 - Blackjack (default)");
 
     let input = get_input();
-    if input == "1" {
-        // println!("Blackjack!");
+
+    if input == "1" || input == "" {
         let mut game = Game::new(Deck::new(None));
         game.start();
+        let game_input = get_input();
+        game.handle_input(game_input);
     } else {
         println!("You input: {}", input);
     }
