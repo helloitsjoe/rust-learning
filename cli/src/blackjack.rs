@@ -19,15 +19,13 @@ impl Deck {
     // TODO: Card values and faces
     Deck {
       cards: make_cards(initial_size),
-      // size: initial_size,
       initial_size,
     }
   }
 
-  pub fn shuffle(self) -> Deck {
+  pub fn shuffle(self) {
     println!("{:?}", self.cards);
     println!("Shuffling");
-    self
   }
 
   pub fn deal_one(&mut self) -> Card {
@@ -88,7 +86,6 @@ pub struct Game {
 
 impl Game {
   pub fn new(deck: Deck) -> Game {
-    // let deck = &mut deck;
     Game {
       num_players: 2,
       player: Player::new(false),
@@ -99,10 +96,9 @@ impl Game {
 
   pub fn start(&mut self) {
     println!("Let's play!");
-    // self.deck.shuffle();
-    let deck = &mut self.deck.clone().shuffle();
-    self.player.deal(deck);
-    self.dealer.deal(deck);
+    &mut self.deck.clone().shuffle();
+    self.player.deal(&mut self.deck);
+    self.dealer.deal(&mut self.deck);
   }
 }
 
