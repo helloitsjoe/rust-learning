@@ -1,0 +1,8 @@
+- [ ] Shuffle
+- [ ] Aces
+- [ ] Gameplay
+  - [ ] Player input
+  - [ ] DI input for tests
+  - [ ] Dealer play
+- [ ] Keep score
+- [ ] Test lifetimes with &str instead of String
