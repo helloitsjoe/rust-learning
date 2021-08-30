@@ -4,5 +4,6 @@
   - [ ] Player input
   - [ ] DI input for tests
   - [ ] Dealer play
+  - [ ] Hide cards
 - [ ] Keep score
 - [ ] Test lifetimes with &str instead of String

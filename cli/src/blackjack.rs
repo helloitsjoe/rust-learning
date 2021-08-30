@@ -56,10 +56,18 @@ impl Card {
   }
 }
 
+#[derive(Debug)]
+enum PlayerState {
+  Won,
+  Lost,
+  Playing,
+}
+
 struct Player {
   hand: Vec<Card>,
   total: u32,
   is_dealer: bool,
+  state: PlayerState,
 }
 
 impl Player {
@@ -68,6 +76,7 @@ impl Player {
       hand: Vec::new(),
       total: 0,
       is_dealer,
+      state: PlayerState::Playing,
     }
   }
 
@@ -86,8 +95,22 @@ impl Player {
   }
 
   pub fn hit(&mut self, card: Card) {
-    self.total += card.val;
     self.hand.push(card);
+    self.total = self.score_cards(self.hand.clone());
+    self.state = self.get_state(self.total);
+  }
+
+  fn score_cards(&self, cards: Vec<Card>) -> u32 {
+    // TODO: Handle aces
+    cards.into_iter().fold(0, |sum, card| card.val + sum)
+  }
+
+  pub fn get_state(&self, total: u32) -> PlayerState {
+    match total {
+      1..=20 => PlayerState::Playing,
+      21 => PlayerState::Won,
+      _ => PlayerState::Lost,
+    }
   }
 }
 
@@ -204,5 +227,17 @@ mod test_blackjack {
     player.hit(Card::new(4));
     assert_eq!(player.hand.len(), 2);
     assert_eq!(player.total, 7);
+  }
+
+  #[test]
+  fn test_player_state() {
+    let mut player = Player::new(false);
+    player.hit(Card::new(10));
+    player.hit(Card::new(10));
+    assert!(matches!(player.state, PlayerState::Playing));
+    player.hit(Card::new(1));
+    assert!(matches!(player.state, PlayerState::Won));
+    player.hit(Card::new(1));
+    assert!(matches!(player.state, PlayerState::Lost));
   }
 }
