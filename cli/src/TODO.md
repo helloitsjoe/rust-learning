@@ -1,9 +1,11 @@
+- [ ] Pass Vec<Card> into Deck instead of length
 - [ ] Shuffle
 - [ ] Aces
+- [x] Face cards worth 10
 - [ ] Gameplay
   - [ ] Player input
   - [ ] DI input for tests
-  - [ ] Dealer play
+  - [x] Dealer play
   - [ ] Hide cards
-- [ ] Keep score
+- [x] Keep score
 - [ ] Test lifetimes with &str instead of String

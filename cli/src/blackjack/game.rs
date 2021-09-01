@@ -45,18 +45,13 @@ impl Game {
   }
 }
 
-#[cfg(test)]
-mod test_blackjack {
-  use super::*;
-
-  #[test]
-  fn test_construct() {
-    let deck = Deck::new(Some(10));
-    let game = &mut Game::new(Some(deck));
-    game.start();
-    assert_eq!(game.num_players, 1);
-    assert_eq!(game.player.hand.len(), 2);
-    assert_eq!(game.dealer.hand.len(), 2);
-    assert_eq!(game.deck.cards.len(), 6);
-  }
+#[test]
+fn new_game() {
+  let deck = Deck::new(Some(10));
+  let game = &mut Game::new(Some(deck));
+  game.start();
+  assert_eq!(game.num_players, 1);
+  assert_eq!(game.player.hand.len(), 2);
+  assert_eq!(game.dealer.hand.len(), 2);
+  assert_eq!(game.deck.cards.len(), 6);
 }
