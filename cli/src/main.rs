@@ -2,7 +2,8 @@ use std::env;
 use std::io;
 
 mod blackjack;
-use blackjack::{Deck, Game};
+
+use blackjack::game::Game;
 
 // TODO: Use a CLI argument parser
 fn main() {
@@ -27,7 +28,7 @@ fn handle_user_input() {
     let input = get_input();
 
     if input == "1" || input == "" {
-        let mut game = Game::new(Deck::new(None));
+        let mut game = Game::new(None);
         game.start();
         let game_input = get_input();
         game.handle_input(game_input);
