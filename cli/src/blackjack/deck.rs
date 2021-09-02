@@ -10,11 +10,14 @@ fn make_cards(length: u32) -> Vec<Card> {
 }
 
 impl Deck {
-  pub fn new(default_size: Option<u32>) -> Deck {
-    let initial_size = default_size.unwrap_or(52);
+  pub fn new(default_cards: Option<Vec<Card>>) -> Deck {
+    const DEFAULT_SIZE: u32 = 52;
+
+    let cards = default_cards.unwrap_or(make_cards(DEFAULT_SIZE));
+    let initial_size = cards.len() as u32;
 
     Deck {
-      cards: make_cards(initial_size),
+      cards,
       initial_size,
     }
   }
@@ -82,26 +85,21 @@ fn basic_deck() {
 
 #[test]
 fn deck_deal_one() {
-  // Not clear to me why deck has to be declared as mutable here
-  let mut deck = Deck::new(Some(2));
-  let card = deck.deal_one();
+  let mut deck = Deck::new(Some(Vec::from([Card::new(2), Card::new(3)])));
+  assert_eq!(deck.cards.len(), 2);
+  deck.deal_one();
   assert_eq!(deck.cards.len(), 1);
-  assert_eq!(card.val, 2);
 }
 
 #[test]
 fn deck_deal_one_until_empty() {
-  // Not clear to me why deck has to be declared as mutable here
-  let mut deck = Deck::new(Some(2));
-  let card = deck.deal_one();
+  let mut deck = Deck::new(Some(Vec::from([Card::new(2), Card::new(3)])));
+  deck.deal_one();
   assert_eq!(deck.cards.len(), 1);
-  assert_eq!(card.val, 2);
-  let card = deck.deal_one();
+  deck.deal_one();
   assert_eq!(deck.cards.len(), 0);
-  assert_eq!(card.val, 1);
-  let card = deck.deal_one();
+  deck.deal_one();
   assert_eq!(deck.cards.len(), 1);
-  assert_eq!(card.val, 2);
 }
 
 #[test]
