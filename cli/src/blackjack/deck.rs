@@ -40,6 +40,13 @@ impl Deck {
 pub struct Card {
   pub val: u32,
   face: String,
+  suit: String,
+}
+
+impl std::fmt::Display for Card {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "{} of {}", self.face, self.suit)
+  }
 }
 
 impl Card {
@@ -48,15 +55,23 @@ impl Card {
     let val = (num_zero_indexed % 13) + 1;
     let val = if val > 10 { 10 } else { val };
 
-    let face = match (num_zero_indexed % 52) + 1 {
-      (1..=13) => String::from("D"),
-      (14..=26) => String::from("H"),
-      (15..=39) => String::from("C"),
-      (16..=52) => String::from("S"),
+    let face = match (num_zero_indexed % 13) + 1 {
+      11 => String::from("J"),
+      12 => String::from("Q"),
+      13 => String::from("K"),
+      1 => String::from("A"),
+      n => n.to_string(),
+    };
+
+    let suit = match (num_zero_indexed % 52) + 1 {
+      (1..=13) => String::from("Diamonds"),
+      (14..=26) => String::from("Hearts"),
+      (15..=39) => String::from("Clubs"),
+      (16..=52) => String::from("Spades"),
       _ => String::from(""),
     };
 
-    Card { val, face }
+    Card { val, face, suit }
   }
 }
 
@@ -64,8 +79,14 @@ impl Card {
 fn basic_deck() {
   let deck = Deck::new(None);
   assert_eq!(deck.cards.len(), 52);
+
+  // Make sure face cards are 10
   assert_eq!(deck.cards[0].val, 1);
+  assert_eq!(deck.cards[9].val, 10);
+  assert_eq!(deck.cards[10].val, 10);
+  assert_eq!(deck.cards[11].val, 10);
   assert_eq!(deck.cards[12].val, 10);
+  // Make sure values loop from 10 back to 1
   assert_eq!(deck.cards[13].val, 1);
   assert_eq!(deck.cards[25].val, 10);
   assert_eq!(deck.cards[26].val, 1);
@@ -73,14 +94,24 @@ fn basic_deck() {
   assert_eq!(deck.cards[39].val, 1);
   assert_eq!(deck.cards[51].val, 10);
 
-  assert_eq!(deck.cards[0].face, String::from("D"));
-  assert_eq!(deck.cards[12].face, String::from("D"));
-  assert_eq!(deck.cards[13].face, String::from("H"));
-  assert_eq!(deck.cards[25].face, String::from("H"));
-  assert_eq!(deck.cards[26].face, String::from("C"));
-  assert_eq!(deck.cards[38].face, String::from("C"));
-  assert_eq!(deck.cards[39].face, String::from("S"));
-  assert_eq!(deck.cards[51].face, String::from("S"));
+  // Make sure faces loop from K back to A
+  assert_eq!(deck.cards[0].face, "A");
+  assert_eq!(deck.cards[12].face, "K");
+  assert_eq!(deck.cards[13].face, "A");
+  assert_eq!(deck.cards[25].face, "K");
+  assert_eq!(deck.cards[26].face, "A");
+  assert_eq!(deck.cards[38].face, "K");
+  assert_eq!(deck.cards[39].face, "A");
+  assert_eq!(deck.cards[51].face, "K");
+
+  assert_eq!(deck.cards[0].suit, String::from("Diamonds"));
+  assert_eq!(deck.cards[12].suit, String::from("Diamonds"));
+  assert_eq!(deck.cards[13].suit, String::from("Hearts"));
+  assert_eq!(deck.cards[25].suit, String::from("Hearts"));
+  assert_eq!(deck.cards[26].suit, String::from("Clubs"));
+  assert_eq!(deck.cards[38].suit, String::from("Clubs"));
+  assert_eq!(deck.cards[39].suit, String::from("Spades"));
+  assert_eq!(deck.cards[51].suit, String::from("Spades"));
 }
 
 #[test]

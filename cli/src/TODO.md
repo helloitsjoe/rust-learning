@@ -1,4 +1,4 @@
-- [ ] Pass Vec<Card> into Deck instead of length
+- [x] Pass Vec<Card> into Deck instead of length
 - [ ] Shuffle
 - [ ] Aces
 - [x] Face cards worth 10
