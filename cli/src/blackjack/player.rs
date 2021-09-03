@@ -104,7 +104,6 @@ fn dealer_stand_on_21() {
   let cards = Vec::from([Card::new(10), Card::new(6), Card::new(5)]);
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
-  println!("State: {:?}", dealer.state);
   assert!(matches!(dealer.state, PlayerState::Playing));
   dealer.play(&mut deck);
   assert!(matches!(dealer.state, PlayerState::Stand))
@@ -116,7 +115,6 @@ fn dealer_hit_on_16() {
   let cards = Vec::from([Card::new(8), Card::new(8), Card::new(8)]);
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
-  println!("State: {:?}", dealer.state);
   assert!(matches!(dealer.state, PlayerState::Playing));
   dealer.play(&mut deck);
   assert!(matches!(dealer.state, PlayerState::Bust))
@@ -128,7 +126,6 @@ fn dealer_stand_on_17() {
   let cards = Vec::from([Card::new(8), Card::new(9)]);
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
-  println!("State: {:?}", dealer.state);
   assert!(matches!(dealer.state, PlayerState::Playing));
   dealer.play(&mut deck);
   assert!(matches!(dealer.state, PlayerState::Stand))
