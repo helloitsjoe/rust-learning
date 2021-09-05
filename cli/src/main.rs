@@ -1,9 +1,9 @@
 use std::env;
-use std::io;
 
 mod blackjack;
 
 use blackjack::game::Game;
+use blackjack::input::Input;
 
 // TODO: Use a CLI argument parser
 fn main() {
@@ -25,23 +25,15 @@ fn handle_user_input() {
     println!("What would you like to do?");
     println!("1 - Blackjack (default)");
 
-    let input = get_input();
+    // This is one way to do mock-able input.
+    // Another way is to inject the io directly: https://stackoverflow.com/a/28370712/8852158
+    let mut input = Input::new(Vec::new());
+    let user_input = input.get_input();
 
-    if input == "1" || input == "" {
+    if user_input == "1" || user_input == "" {
         let mut game = Game::new(None);
-        // TODO: Input struct to hold multiple rounds of responses
-        game.start(get_input);
+        game.start(&mut input);
     } else {
-        println!("You input: {}", input);
+        println!("You input: {}", user_input);
     }
-}
-
-fn get_input() -> String {
-    let mut buf = String::new();
-
-    io::stdin()
-        .read_line(&mut buf)
-        .expect("Something went wrong");
-
-    String::from(buf.trim())
 }

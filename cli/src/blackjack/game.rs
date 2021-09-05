@@ -1,5 +1,6 @@
 use super::deck::Deck;
-use super::player::Player;
+use super::input::Input;
+use super::player::{Player, PlayerState};
 
 pub struct Game {
   num_players: u32,
@@ -18,22 +19,29 @@ impl Game {
     }
   }
 
-  pub fn start(&mut self, get_input: fn() -> String) {
+  pub fn start(&mut self, input: &mut Input) {
     println!("Let's play! {} players", self.num_players);
     &mut self.deck.clone().shuffle();
     self.player.deal(&mut self.deck);
     self.dealer.deal(&mut self.deck);
     self.show_score();
-    println!("hit or stay? Type 'hit' or 'h' to hit, anything else to stay.");
-    self.handle_input(get_input());
+    self.handle_input(input);
   }
 
-  pub fn handle_input(&mut self, input: String) {
-    let lower = input.to_lowercase();
+  pub fn handle_input(&mut self, input: &mut Input) {
+    println!("hit or stay? Type 'hit' or 'h' to hit, anything else to stay.");
+    let lower = input.get_input().to_lowercase();
     match lower.as_str() {
       "hit" | "h" => {
         self.player.hit(self.deck.deal_one(true));
         self.show_score();
+
+        // if matches!(
+        //   self.player.get_state(self.player.total),
+        //   PlayerState::Playing
+        // ) {
+        self.handle_input(input);
+        // }
       }
       _ => {
         println!("You stayed.");
@@ -51,19 +59,11 @@ impl Game {
   }
 }
 
-fn mock_stay() -> String {
-  String::from("stay")
-}
-
-fn mock_hit() -> String {
-  String::from("hit")
-}
-
 #[test]
 fn new_game() {
   let deck = Deck::new(None);
   let game = &mut Game::new(Some(deck));
-  game.start(mock_stay);
+  game.start(&mut Input::new(Vec::from([String::from("stay")])));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 2);
   assert_eq!(game.dealer.hand.len(), 2);
@@ -74,9 +74,23 @@ fn new_game() {
 fn player_hit() {
   let deck = Deck::new(None);
   let game = &mut Game::new(Some(deck));
-  game.start(mock_hit);
+  game.start(&mut Input::new(Vec::from([String::from("hit")])));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 3);
   assert_eq!(game.dealer.hand.len(), 2);
   assert_eq!(game.deck.cards.len(), 47);
+}
+
+#[test]
+fn player_hit_twice() {
+  let deck = Deck::new(None);
+  let game = &mut Game::new(Some(deck));
+  game.start(&mut Input::new(Vec::from([
+    String::from("hit"),
+    String::from("hit"),
+  ])));
+  assert_eq!(game.num_players, 1);
+  assert_eq!(game.player.hand.len(), 4);
+  assert_eq!(game.dealer.hand.len(), 2);
+  assert_eq!(game.deck.cards.len(), 46);
 }
