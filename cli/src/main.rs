@@ -29,9 +29,8 @@ fn handle_user_input() {
 
     if input == "1" || input == "" {
         let mut game = Game::new(None);
-        game.start();
-        let game_input = get_input();
-        game.handle_input(game_input);
+        // TODO: Input struct to hold multiple rounds of responses
+        game.start(get_input);
     } else {
         println!("You input: {}", input);
     }
