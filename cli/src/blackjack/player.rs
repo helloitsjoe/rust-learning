@@ -36,9 +36,15 @@ impl Player {
       }
     };
     println!("Dealing {}", player_or_dealer);
-    self.hit(deck.deal_one());
-    self.hit(deck.deal_one());
-    println!("{:?}", self.hand);
+    self.hit(deck.deal_one(!self.is_dealer));
+    self.hit(deck.deal_one(true));
+    println!("{}", self.render_hand());
+  }
+
+  pub fn reveal(&mut self) {
+    for card in &mut self.hand {
+      card.reveal();
+    }
   }
 
   pub fn hit(&mut self, card: Card) {
@@ -54,7 +60,7 @@ impl Player {
       self.state = PlayerState::Stand;
       return;
     }
-    self.hit(deck.deal_one());
+    self.hit(deck.deal_one(true));
     if self.total > 21 {
       self.state = PlayerState::Bust;
       return;
@@ -65,6 +71,26 @@ impl Player {
   fn score_cards(&self, cards: Vec<Card>) -> u32 {
     // TODO: Handle aces
     cards.into_iter().fold(0, |sum, card| card.val + sum)
+  }
+
+  pub fn render_hand(&self) -> String {
+    self
+      .hand
+      .clone()
+      .into_iter()
+      .fold(String::new(), |s, card| s + &card.render() + "\n")
+  }
+
+  pub fn render_total(&self) -> String {
+    self
+      .hand
+      .clone()
+      .into_iter()
+      .fold(
+        0,
+        |sum, card| if card.face_up { card.val + sum } else { sum },
+      )
+      .to_string()
   }
 
   pub fn get_state(&self, total: u32) -> PlayerState {
@@ -129,4 +155,27 @@ fn dealer_stand_on_17() {
   assert!(matches!(dealer.state, PlayerState::Playing));
   dealer.play(&mut deck);
   assert!(matches!(dealer.state, PlayerState::Stand))
+}
+
+#[test]
+fn dealer_hide_and_reveal() {
+  let mut dealer = Player::new(true);
+  let cards = Vec::from([Card::new(8), Card::new(9)]);
+  let mut deck = Deck::new(Some(cards));
+  dealer.deal(&mut deck);
+  assert_eq!(dealer.render_total(), "8");
+  assert_eq!(dealer.render_hand(), "(Face down)\n8 of Diamonds\n");
+  dealer.reveal();
+  assert_eq!(dealer.render_total(), "17");
+  assert_eq!(dealer.render_hand(), "9 of Diamonds\n8 of Diamonds\n");
+}
+
+#[test]
+fn player_hand_is_reveaaled() {
+  let mut dealer = Player::new(false);
+  let cards = Vec::from([Card::new(8), Card::new(9)]);
+  let mut deck = Deck::new(Some(cards));
+  dealer.deal(&mut deck);
+  assert_eq!(dealer.render_total(), "17");
+  assert_eq!(dealer.render_hand(), "9 of Diamonds\n8 of Diamonds\n");
 }

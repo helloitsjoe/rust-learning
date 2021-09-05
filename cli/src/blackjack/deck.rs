@@ -23,16 +23,22 @@ impl Deck {
   }
 
   pub fn shuffle(self) {
-    println!("{:?}", self.cards);
+    // println!("{:?}", self.cards);
     println!("Shuffling");
   }
 
-  pub fn deal_one(&mut self) -> Card {
+  pub fn deal_one(&mut self, face_up: bool) -> Card {
     if self.cards.len() == 0 {
       self.cards = make_cards(self.initial_size);
     }
 
-    self.cards.pop().unwrap()
+    let mut card = self.cards.pop().unwrap();
+
+    if face_up {
+      card.reveal();
+    }
+
+    card
   }
 }
 
@@ -41,13 +47,18 @@ pub struct Card {
   pub val: u32,
   face: String,
   suit: String,
+  pub face_up: bool,
 }
 
-impl std::fmt::Display for Card {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "{} of {}", self.face, self.suit)
-  }
-}
+// impl std::fmt::Display for Card {
+//   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+//     if self.face_up {
+//       write!(f, "{} of {}", self.face, self.suit)
+//     } else {
+//       write!(f, "(Hidden)")
+//     }
+//   }
+// }
 
 impl Card {
   pub fn new(num: u32) -> Card {
@@ -71,7 +82,24 @@ impl Card {
       _ => String::from(""),
     };
 
-    Card { val, face, suit }
+    Card {
+      val,
+      face,
+      suit,
+      face_up: false,
+    }
+  }
+
+  pub fn render(&self) -> String {
+    if self.face_up {
+      format!("{} of {}", self.face, self.suit)
+    } else {
+      format!("(Face down)")
+    }
+  }
+
+  pub fn reveal(&mut self) {
+    self.face_up = true;
   }
 }
 
@@ -118,18 +146,18 @@ fn basic_deck() {
 fn deck_deal_one() {
   let mut deck = Deck::new(Some(Vec::from([Card::new(2), Card::new(3)])));
   assert_eq!(deck.cards.len(), 2);
-  deck.deal_one();
+  deck.deal_one(true);
   assert_eq!(deck.cards.len(), 1);
 }
 
 #[test]
 fn deck_deal_one_until_empty() {
   let mut deck = Deck::new(Some(Vec::from([Card::new(2), Card::new(3)])));
-  deck.deal_one();
+  deck.deal_one(true);
   assert_eq!(deck.cards.len(), 1);
-  deck.deal_one();
+  deck.deal_one(true);
   assert_eq!(deck.cards.len(), 0);
-  deck.deal_one();
+  deck.deal_one(true);
   assert_eq!(deck.cards.len(), 1);
 }
 
@@ -145,4 +173,12 @@ fn card_val() {
   assert_eq!(card.val, 10);
   let card = Card::new(13);
   assert_eq!(card.val, 10);
+}
+
+#[test]
+fn card_reveal() {
+  let mut card = Card::new(2);
+  assert_eq!(card.render(), "(Face down)");
+  card.reveal();
+  assert_eq!(card.render(), "2 of Diamonds");
 }

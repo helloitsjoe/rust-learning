@@ -29,7 +29,7 @@ impl Game {
 
   pub fn handle_input(&mut self, input: String) {
     if input == "hit" {
-      self.player.hit(self.deck.deal_one());
+      self.player.hit(self.deck.deal_one(true));
       self.show_score();
     } else {
       println!("You stayed.");
@@ -40,7 +40,8 @@ impl Game {
   fn show_score(&self) {
     println!(
       "You have {}, dealer shows {}",
-      self.player.total, self.dealer.total
+      self.player.render_total(),
+      self.dealer.render_total()
     );
   }
 }

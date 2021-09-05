@@ -6,6 +6,6 @@
   - [ ] Player input
   - [ ] DI input for tests
   - [x] Dealer play
-  - [ ] Hide cards
+  - [x] Hide cards
 - [x] Keep score
 - [ ] Test lifetimes with &str instead of String
