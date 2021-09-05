@@ -24,17 +24,21 @@ impl Game {
     self.player.deal(&mut self.deck);
     self.dealer.deal(&mut self.deck);
     self.show_score();
-    println!("hit or stay?");
+    println!("hit or stay? Type 'hit' or 'h' to hit, anything else to stay.");
     self.handle_input(get_input());
   }
 
   pub fn handle_input(&mut self, input: String) {
-    if input == "hit" {
-      self.player.hit(self.deck.deal_one(true));
-      self.show_score();
-    } else {
-      println!("You stayed.");
-      self.show_score();
+    let lower = input.to_lowercase();
+    match lower.as_str() {
+      "hit" | "h" => {
+        self.player.hit(self.deck.deal_one(true));
+        self.show_score();
+      }
+      _ => {
+        println!("You stayed.");
+        self.show_score();
+      }
     }
   }
 
