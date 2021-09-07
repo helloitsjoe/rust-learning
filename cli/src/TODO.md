@@ -1,9 +1,10 @@
 - [x] Pass Vec<Card> into Deck instead of length
-- [ ] Shuffle
-- [ ] Aces
+- [x] Shuffle
+- [x] Aces
 - [x] Face cards worth 10
 - [ ] Gameplay
   - [ ] Player input
+    - [ ] Dealer play after player stands
   - [ ] DI input for tests
   - [x] Dealer play
   - [x] Hide cards

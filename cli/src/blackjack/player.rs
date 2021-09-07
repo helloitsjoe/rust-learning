@@ -53,6 +53,10 @@ impl Player {
     self.state = self.get_state(self.total);
   }
 
+  pub fn stand(&mut self) {
+    self.state = PlayerState::Stand;
+  }
+
   pub fn play(&mut self, deck: &mut Deck) {
     // TODO: use traits to separate dealer/player behavior.
     // Only dealer should implement play()
@@ -69,8 +73,14 @@ impl Player {
   }
 
   fn score_cards(&self, cards: Vec<Card>) -> u32 {
-    // TODO: Handle aces
-    cards.into_iter().fold(0, |sum, card| card.val + sum)
+    cards.into_iter().fold(0, |sum, card| {
+      let ace_over_21 = card.val == 11 && sum + card.val > 21;
+      if ace_over_21 {
+        sum + 1
+      } else {
+        sum + card.val
+      }
+    })
   }
 
   pub fn render_hand(&self) -> String {
@@ -172,10 +182,24 @@ fn dealer_hide_and_reveal() {
 
 #[test]
 fn player_hand_is_reveaaled() {
-  let mut dealer = Player::new(false);
+  let mut player = Player::new(false);
   let cards = Vec::from([Card::new(8), Card::new(9)]);
   let mut deck = Deck::new(Some(cards));
-  dealer.deal(&mut deck);
-  assert_eq!(dealer.render_total(), "17");
-  assert_eq!(dealer.render_hand(), "9 of Diamonds\n8 of Diamonds\n");
+  player.deal(&mut deck);
+  assert_eq!(player.render_total(), "17");
+  assert_eq!(player.render_hand(), "9 of Diamonds\n8 of Diamonds\n");
+}
+
+#[test]
+fn ace() {
+  let mut player = Player::new(false);
+  // Cards pop from the end
+  let cards = Vec::from([Card::new(1), Card::new(8), Card::new(1), Card::new(1)]);
+  let mut deck = Deck::new(Some(cards));
+  player.deal(&mut deck);
+  assert_eq!(player.total, 12);
+  player.hit(deck.deal_one(true));
+  assert_eq!(player.total, 20);
+  player.hit(deck.deal_one(true));
+  assert_eq!(player.total, 21);
 }
