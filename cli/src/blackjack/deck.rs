@@ -1,3 +1,6 @@
+use rand::seq::SliceRandom;
+use rand::thread_rng;
+
 #[derive(Debug, Clone)]
 pub struct Deck {
   pub cards: Vec<Card>,
@@ -22,9 +25,10 @@ impl Deck {
     }
   }
 
-  pub fn shuffle(self) {
-    // println!("{:?}", self.cards);
+  pub fn shuffle(&mut self) {
     println!("Shuffling");
+    self.cards.shuffle(&mut thread_rng());
+    println!("{:?}", self.cards);
   }
 
   pub fn deal_one(&mut self, face_up: bool) -> Card {
@@ -181,4 +185,15 @@ fn card_reveal() {
   assert_eq!(card.render(), "(Face down)");
   card.reveal();
   assert_eq!(card.render(), "2 of Diamonds");
+}
+
+// This has a small chance of failing
+#[test]
+fn shuffle() {
+  let mut deck = Deck::new(None);
+  let cards = &deck.cards;
+  assert_eq!(cards[0].val, 1);
+  deck.shuffle();
+  let cards = &deck.cards;
+  assert_ne!(cards[0].val, 1);
 }
