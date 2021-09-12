@@ -54,21 +54,12 @@ pub struct Card {
   pub face_up: bool,
 }
 
-// impl std::fmt::Display for Card {
-//   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-//     if self.face_up {
-//       write!(f, "{} of {}", self.face, self.suit)
-//     } else {
-//       write!(f, "(Hidden)")
-//     }
-//   }
-// }
-
 impl Card {
   pub fn new(num: u32) -> Card {
     let num_zero_indexed = num - 1;
     let val = (num_zero_indexed % 13) + 1;
-    let val = if val > 10 { 10 } else { val };
+    let val_aces_one = if val > 10 { 10 } else { val };
+    let val = if val_aces_one == 1 { 11 } else { val_aces_one };
 
     let face = match (num_zero_indexed % 13) + 1 {
       11 => String::from("J"),
@@ -113,17 +104,17 @@ fn basic_deck() {
   assert_eq!(deck.cards.len(), 52);
 
   // Make sure face cards are 10
-  assert_eq!(deck.cards[0].val, 1);
+  assert_eq!(deck.cards[0].val, 11);
   assert_eq!(deck.cards[9].val, 10);
   assert_eq!(deck.cards[10].val, 10);
   assert_eq!(deck.cards[11].val, 10);
   assert_eq!(deck.cards[12].val, 10);
   // Make sure values loop from 10 back to 1
-  assert_eq!(deck.cards[13].val, 1);
+  assert_eq!(deck.cards[13].val, 11);
   assert_eq!(deck.cards[25].val, 10);
-  assert_eq!(deck.cards[26].val, 1);
+  assert_eq!(deck.cards[26].val, 11);
   assert_eq!(deck.cards[38].val, 10);
-  assert_eq!(deck.cards[39].val, 1);
+  assert_eq!(deck.cards[39].val, 11);
   assert_eq!(deck.cards[51].val, 10);
 
   // Make sure faces loop from K back to A
@@ -192,8 +183,8 @@ fn card_reveal() {
 fn shuffle() {
   let mut deck = Deck::new(None);
   let cards = &deck.cards;
-  assert_eq!(cards[0].val, 1);
+  assert_eq!(cards[0].val, 11);
   deck.shuffle();
   let cards = &deck.cards;
-  assert_ne!(cards[0].val, 1);
+  assert_ne!(cards[0].val, 11);
 }

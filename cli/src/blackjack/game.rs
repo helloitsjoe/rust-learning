@@ -46,6 +46,7 @@ impl Game {
       _ => {
         println!("You stayed.");
         self.show_score();
+      // TODO: Play dealer
       }
     }
   }
