@@ -7,6 +7,7 @@ pub struct Deck {
   initial_size: u32,
 }
 
+// TODO: Pass array instead of length?
 fn make_cards(length: u32) -> Vec<Card> {
   let cards = (1..length + 1).map(|n| Card::new(n)).collect::<Vec<Card>>();
   Vec::from(cards)
@@ -28,7 +29,7 @@ impl Deck {
   pub fn shuffle(&mut self) {
     println!("Shuffling");
     self.cards.shuffle(&mut thread_rng());
-    println!("{:?}", self.cards);
+    // println!("{:?}", self.cards);
   }
 
   pub fn deal_one(&mut self, face_up: bool) -> Card {
@@ -183,8 +184,8 @@ fn card_reveal() {
 fn shuffle() {
   let mut deck = Deck::new(None);
   let cards = &deck.cards;
-  assert_eq!(cards[0].val, 11);
+  assert!(cards[0].val == 11 && cards[1].val == 2 && cards[2].val == 3);
   deck.shuffle();
   let cards = &deck.cards;
-  assert_ne!(cards[0].val, 11);
+  assert!(!(cards[0].val == 11 && cards[1].val == 2 && cards[2].val == 3));
 }

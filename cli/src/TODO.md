@@ -5,8 +5,11 @@
 - [ ] Gameplay
   - [ ] Player input
     - [ ] Dealer play after player stands
-  - [ ] DI input for tests
+  - [x] DI input for tests
   - [x] Dealer play
   - [x] Hide cards
+  - [ ] Double down
+  - [ ] Split
+  - [ ] Tie
 - [x] Keep score
 - [ ] Test lifetimes with &str instead of String

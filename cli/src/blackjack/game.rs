@@ -1,4 +1,4 @@
-use super::deck::Deck;
+use super::deck::{Card, Deck};
 use super::input::Input;
 use super::player::{Player, PlayerState};
 
@@ -15,13 +15,21 @@ impl Game {
       num_players: 1,
       player: Player::new(false),
       dealer: Player::new(true),
+      // deck: deck.unwrap_or(Deck::new(Some(Vec::from([
+      //   Card::new(10),
+      //   Card::new(2),
+      //   Card::new(1),
+      //   Card::new(2),
+      //   Card::new(3),
+      // ])))),
       deck: deck.unwrap_or(Deck::new(None)),
     }
   }
 
   pub fn start(&mut self, input: &mut Input) {
     println!("Let's play! {} players", self.num_players);
-    &mut self.deck.clone().shuffle();
+    &mut self.deck.shuffle();
+    // TODO: Should deal alternately to player/dealer
     self.player.deal(&mut self.deck);
     self.dealer.deal(&mut self.deck);
     self.show_score();
@@ -36,17 +44,33 @@ impl Game {
         self.player.hit(self.deck.deal_one(true));
         self.show_score();
 
-        // if matches!(
-        //   self.player.get_state(self.player.total),
-        //   PlayerState::Playing
-        // ) {
-        self.handle_input(input);
-        // }
+        // TODO: Really only makes sense to match Bust and Playing
+        match self.player.get_state() {
+          PlayerState::Bust => println!("Bust, you lose!"),
+          PlayerState::Lost => println!("You lose!"),
+          PlayerState::Won => println!("You win!"),
+          PlayerState::Stand => println!("Shouldn't get here"),
+          PlayerState::Playing => self.handle_input(input),
+          PlayerState::Blackjack => println!("Blackjack!"),
+        }
       }
       _ => {
         println!("You stayed.");
+        self.player.stand();
+        self.dealer.reveal();
+        self.dealer.play(&mut self.deck);
+        println!("Dealer:\n{}", self.dealer.render_hand());
         self.show_score();
-      // TODO: Play dealer
+        let state = self.compare_player_dealer();
+
+        match state {
+          PlayerState::Bust => println!("Bust, you lose!"),
+          PlayerState::Lost => println!("You lose!"),
+          PlayerState::Stand => println!("Stand"),
+          PlayerState::Won => println!("You win!"),
+          PlayerState::Playing => println!("Shouldn't get here!"),
+          PlayerState::Blackjack => println!("Blackjack!"),
+        }
       }
     }
   }
@@ -58,6 +82,16 @@ impl Game {
       self.dealer.render_total()
     );
   }
+
+  fn compare_player_dealer(&self) -> PlayerState {
+    if self.dealer.total > 21 {
+      PlayerState::Won
+    } else if self.dealer.total > self.player.total {
+      PlayerState::Lost
+    } else {
+      self.player.get_state()
+    }
+  }
 }
 
 #[test]
@@ -67,24 +101,26 @@ fn new_game() {
   game.start(&mut Input::new(Vec::from([String::from("stay")])));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 2);
-  assert_eq!(game.dealer.hand.len(), 2);
-  assert_eq!(game.deck.cards.len(), 48);
+  assert!(game.dealer.hand.len() >= 2);
+  assert!(game.deck.cards.len() <= 48);
 }
 
 #[test]
 fn player_hit() {
-  let deck = Deck::new(None);
+  let cards = Vec::from([Card::new(4), Card::new(3), Card::new(2), Card::new(2)]);
+  let deck = Deck::new(Some(cards));
   let game = &mut Game::new(Some(deck));
   game.start(&mut Input::new(Vec::from([String::from("hit")])));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 3);
-  assert_eq!(game.dealer.hand.len(), 2);
-  assert_eq!(game.deck.cards.len(), 47);
+  assert!(game.dealer.hand.len() >= 2);
+  assert!(game.deck.cards.len() <= 47);
 }
 
 #[test]
 fn player_hit_twice() {
-  let deck = Deck::new(None);
+  let cards = Vec::from([Card::new(4), Card::new(3), Card::new(2), Card::new(2)]);
+  let deck = Deck::new(Some(cards));
   let game = &mut Game::new(Some(deck));
   game.start(&mut Input::new(Vec::from([
     String::from("hit"),
@@ -92,6 +128,6 @@ fn player_hit_twice() {
   ])));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 4);
-  assert_eq!(game.dealer.hand.len(), 2);
-  assert_eq!(game.deck.cards.len(), 46);
+  assert!(game.dealer.hand.len() >= 2);
+  assert!(game.deck.cards.len() <= 46);
 }
