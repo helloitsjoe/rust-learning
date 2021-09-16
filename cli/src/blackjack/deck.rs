@@ -4,25 +4,21 @@ use rand::thread_rng;
 #[derive(Debug, Clone)]
 pub struct Deck {
   pub cards: Vec<Card>,
-  initial_size: u32,
+  initial_values: Vec<u32>,
 }
 
-// TODO: Pass array instead of length?
-fn make_cards(length: u32) -> Vec<Card> {
-  let cards = (1..length + 1).map(|n| Card::new(n)).collect::<Vec<Card>>();
-  Vec::from(cards)
+fn make_cards(nums: Vec<u32>) -> Vec<Card> {
+  nums.iter().map(|&n| Card::new(n)).collect::<Vec<Card>>()
 }
 
 impl Deck {
-  pub fn new(default_cards: Option<Vec<Card>>) -> Deck {
-    const DEFAULT_SIZE: u32 = 52;
-
-    let cards = default_cards.unwrap_or(make_cards(DEFAULT_SIZE));
-    let initial_size = cards.len() as u32;
+  pub fn new(default_values: Option<Vec<u32>>) -> Deck {
+    let initial_values = (1..53).collect::<Vec<u32>>();
+    let values = default_values.unwrap_or(initial_values);
 
     Deck {
-      cards,
-      initial_size,
+      cards: make_cards(values.clone()),
+      initial_values: values.clone(),
     }
   }
 
@@ -34,7 +30,7 @@ impl Deck {
 
   pub fn deal_one(&mut self, face_up: bool) -> Card {
     if self.cards.len() == 0 {
-      self.cards = make_cards(self.initial_size);
+      self.cards = make_cards(self.initial_values.clone());
     }
 
     let mut card = self.cards.pop().unwrap();
@@ -140,7 +136,7 @@ fn basic_deck() {
 
 #[test]
 fn deck_deal_one() {
-  let mut deck = Deck::new(Some(Vec::from([Card::new(2), Card::new(3)])));
+  let mut deck = Deck::new(Some(vec![2, 3]));
   assert_eq!(deck.cards.len(), 2);
   deck.deal_one(true);
   assert_eq!(deck.cards.len(), 1);
@@ -148,7 +144,7 @@ fn deck_deal_one() {
 
 #[test]
 fn deck_deal_one_until_empty() {
-  let mut deck = Deck::new(Some(Vec::from([Card::new(2), Card::new(3)])));
+  let mut deck = Deck::new(Some(vec![2, 3]));
   deck.deal_one(true);
   assert_eq!(deck.cards.len(), 1);
   deck.deal_one(true);

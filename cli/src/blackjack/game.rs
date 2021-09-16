@@ -1,4 +1,4 @@
-use super::deck::{Card, Deck};
+use super::deck::Deck;
 use super::input::Input;
 use super::player::{Player, PlayerState};
 
@@ -15,13 +15,6 @@ impl Game {
       num_players: 1,
       player: Player::new(false),
       dealer: Player::new(true),
-      // deck: deck.unwrap_or(Deck::new(Some(Vec::from([
-      //   Card::new(10),
-      //   Card::new(2),
-      //   Card::new(1),
-      //   Card::new(2),
-      //   Card::new(3),
-      // ])))),
       deck: deck.unwrap_or(Deck::new(None)),
     }
   }
@@ -38,20 +31,17 @@ impl Game {
 
   pub fn handle_input(&mut self, input: &mut Input) {
     println!("hit or stay? Type 'hit' or 'h' to hit, anything else to stay.");
-    let lower = input.get_input().to_lowercase();
-    match lower.as_str() {
+    match input.get_input().to_lowercase().as_str() {
       "hit" | "h" => {
         self.player.hit(self.deck.deal_one(true));
+        println!("{}", self.player.render_hand());
         self.show_score();
 
-        // TODO: Really only makes sense to match Bust and Playing
         match self.player.get_state() {
           PlayerState::Bust => println!("Bust, you lose!"),
-          PlayerState::Lost => println!("You lose!"),
-          PlayerState::Won => println!("You win!"),
-          PlayerState::Stand => println!("Shouldn't get here"),
           PlayerState::Playing => self.handle_input(input),
           PlayerState::Blackjack => println!("Blackjack!"),
+          _ => println!("Shouldn't get here"),
         }
       }
       _ => {
@@ -84,7 +74,8 @@ impl Game {
   }
 
   fn compare_player_dealer(&self) -> PlayerState {
-    if self.dealer.total > 21 {
+    if self.dealer.total > 21 || (self.player.total <= 21 && self.player.total > self.dealer.total)
+    {
       PlayerState::Won
     } else if self.dealer.total > self.player.total {
       PlayerState::Lost
@@ -107,7 +98,7 @@ fn new_game() {
 
 #[test]
 fn player_hit() {
-  let cards = Vec::from([Card::new(4), Card::new(3), Card::new(2), Card::new(2)]);
+  let cards = vec![4, 3, 2, 2];
   let deck = Deck::new(Some(cards));
   let game = &mut Game::new(Some(deck));
   game.start(&mut Input::new(Vec::from([String::from("hit")])));
@@ -119,7 +110,7 @@ fn player_hit() {
 
 #[test]
 fn player_hit_twice() {
-  let cards = Vec::from([Card::new(4), Card::new(3), Card::new(2), Card::new(2)]);
+  let cards = vec![4, 3, 2, 2];
   let deck = Deck::new(Some(cards));
   let game = &mut Game::new(Some(deck));
   game.start(&mut Input::new(Vec::from([

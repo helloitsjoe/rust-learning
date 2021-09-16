@@ -92,9 +92,8 @@ impl Player {
       .into_iter()
       .fold(0, |sum, card| card.val + sum);
 
-    println!("Dealer? {}", self.is_dealer);
     let total = cards.into_iter().fold(sum_aces_11, score_aces);
-    println!("Total {}", total);
+    // println!("Total {}", total);
     total
   }
 
@@ -132,7 +131,7 @@ impl Player {
     match total {
       1..=20 => PlayerState::Playing,
       21 => PlayerState::Blackjack,
-      _ => PlayerState::Lost,
+      _ => PlayerState::Bust,
     }
   }
 
@@ -166,7 +165,7 @@ fn player_state() {
 #[test]
 fn dealer_stand_on_21() {
   let mut dealer = Player::new(true);
-  let cards = Vec::from([Card::new(10), Card::new(6), Card::new(5)]);
+  let cards = vec![10, 6, 5];
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
   assert!(matches!(dealer.state, PlayerState::Playing));
@@ -177,7 +176,7 @@ fn dealer_stand_on_21() {
 #[test]
 fn dealer_hit_on_16() {
   let mut dealer = Player::new(true);
-  let cards = Vec::from([Card::new(8), Card::new(8), Card::new(8)]);
+  let cards = vec![8, 8, 8];
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
   assert!(matches!(dealer.state, PlayerState::Playing));
@@ -188,7 +187,7 @@ fn dealer_hit_on_16() {
 #[test]
 fn dealer_stand_on_17() {
   let mut dealer = Player::new(true);
-  let cards = Vec::from([Card::new(8), Card::new(9)]);
+  let cards = vec![8, 9];
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
   assert!(matches!(dealer.state, PlayerState::Playing));
@@ -199,7 +198,7 @@ fn dealer_stand_on_17() {
 #[test]
 fn dealer_hide_and_reveal() {
   let mut dealer = Player::new(true);
-  let cards = Vec::from([Card::new(8), Card::new(9)]);
+  let cards = vec![8, 9];
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
   assert_eq!(dealer.render_total(), "8");
@@ -212,7 +211,7 @@ fn dealer_hide_and_reveal() {
 #[test]
 fn render_total_with_aces() {
   let mut dealer = Player::new(true);
-  let cards = Vec::from([Card::new(9), Card::new(8), Card::new(1)]);
+  let cards = vec![9, 8, 1];
   let mut deck = Deck::new(Some(cards));
   dealer.deal(&mut deck);
   assert_eq!(dealer.render_total(), "8");
@@ -225,7 +224,7 @@ fn render_total_with_aces() {
 #[test]
 fn player_hand_is_reveaaled() {
   let mut player = Player::new(false);
-  let cards = Vec::from([Card::new(8), Card::new(9)]);
+  let cards = vec![8, 9];
   let mut deck = Deck::new(Some(cards));
   player.deal(&mut deck);
   assert_eq!(player.render_total(), "17");
@@ -236,7 +235,7 @@ fn player_hand_is_reveaaled() {
 fn ace() {
   let mut player = Player::new(false);
   // Cards pop from the end
-  let cards = Vec::from([Card::new(1), Card::new(8), Card::new(1), Card::new(1)]);
+  let cards = vec![1, 8, 1, 1];
   let mut deck = Deck::new(Some(cards));
   player.deal(&mut deck);
   assert_eq!(player.total, 12);
@@ -250,7 +249,7 @@ fn ace() {
 fn ace_first() {
   let mut player = Player::new(false);
   // Cards pop from the end
-  let cards = Vec::from([Card::new(10), Card::new(2), Card::new(1)]);
+  let cards = vec![10, 2, 1];
   let mut deck = Deck::new(Some(cards));
   player.deal(&mut deck);
   assert_eq!(player.total, 13);
@@ -262,7 +261,7 @@ fn ace_first() {
 fn multiple_aces() {
   let mut player = Player::new(false);
   // Cards pop from the end
-  let cards = Vec::from([Card::new(10), Card::new(1), Card::new(1)]);
+  let cards = vec![10, 1, 1];
   let mut deck = Deck::new(Some(cards));
   player.deal(&mut deck);
   assert_eq!(player.total, 12);

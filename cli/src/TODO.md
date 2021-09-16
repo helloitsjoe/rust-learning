@@ -4,7 +4,7 @@
 - [x] Face cards worth 10
 - [ ] Gameplay
   - [ ] Player input
-    - [ ] Dealer play after player stands
+    - [x] Dealer play after player stands
   - [x] DI input for tests
   - [x] Dealer play
   - [x] Hide cards
