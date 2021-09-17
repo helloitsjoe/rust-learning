@@ -1,6 +1,6 @@
 use super::deck::{Card, Deck};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum PlayerState {
   Bust,
   Stand,
@@ -18,7 +18,7 @@ pub struct Player {
   state: PlayerState,
 }
 
-fn score_aces(sum: u32, card: &mut Card) -> u32 {
+fn score_aces(sum: u32, card: &Card) -> u32 {
   let ace_over_21 = card.val == 11 && sum > 21;
   if ace_over_21 {
     sum - 10
@@ -61,7 +61,7 @@ impl Player {
 
   pub fn hit(&mut self, card: Card) {
     self.hand.push(card);
-    self.total = self.score_cards(&mut self.hand.clone());
+    self.total = self.score_cards(&self.hand);
     // println!("Total: {}", self.total);
     self.state = self.get_state_from_total(self.total);
   }
@@ -86,11 +86,8 @@ impl Player {
     self.play(deck);
   }
 
-  fn score_cards(&self, cards: &mut Vec<Card>) -> u32 {
-    let sum_aces_11 = cards
-      .clone()
-      .into_iter()
-      .fold(0, |sum, card| card.val + sum);
+  fn score_cards(&self, cards: &Vec<Card>) -> u32 {
+    let sum_aces_11 = cards.into_iter().fold(0, |sum, card| card.val + sum);
 
     let total = cards.into_iter().fold(sum_aces_11, score_aces);
     // println!("Total {}", total);
@@ -98,9 +95,8 @@ impl Player {
   }
 
   pub fn render_hand(&self) -> String {
-    self
-      .hand
-      .clone()
+    let hand = &self.hand;
+    hand
       .into_iter()
       .fold(String::new(), |s, card| s + &card.render() + "\n")
   }
@@ -110,21 +106,19 @@ impl Player {
       return self.total.to_string();
     }
 
-    self
-      .hand
-      .clone()
-      .into_iter()
-      .fold(
-        0,
-        |sum, card| {
-          if card.face_up {
-            sum + card.val
-          } else {
-            sum
-          }
-        },
-      )
-      .to_string()
+    let hand = &self.hand;
+    let sum = hand.into_iter().fold(
+      0,
+      |sum, card| {
+        if card.face_up {
+          sum + card.val
+        } else {
+          sum
+        }
+      },
+    );
+
+    sum.to_string()
   }
 
   fn get_state_from_total(&self, total: u32) -> PlayerState {
@@ -135,8 +129,8 @@ impl Player {
     }
   }
 
-  pub fn get_state(&self) -> PlayerState {
-    self.state.clone()
+  pub fn get_state(&self) -> &PlayerState {
+    &self.state
   }
 }
 
@@ -159,7 +153,7 @@ fn player_state() {
   player.hit(Card::new(1));
   assert!(matches!(player.state, PlayerState::Blackjack));
   player.hit(Card::new(1));
-  assert!(matches!(player.state, PlayerState::Lost));
+  assert!(matches!(player.state, PlayerState::Bust));
 }
 
 #[test]

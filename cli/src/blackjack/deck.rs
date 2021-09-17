@@ -1,13 +1,13 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Deck {
   pub cards: Vec<Card>,
   initial_values: Vec<u32>,
 }
 
-fn make_cards(nums: Vec<u32>) -> Vec<Card> {
+fn make_cards(nums: &Vec<u32>) -> Vec<Card> {
   nums.iter().map(|&n| Card::new(n)).collect::<Vec<Card>>()
 }
 
@@ -17,8 +17,8 @@ impl Deck {
     let values = default_values.unwrap_or(initial_values);
 
     Deck {
-      cards: make_cards(values.clone()),
-      initial_values: values.clone(),
+      cards: make_cards(&values),
+      initial_values: values,
     }
   }
 
@@ -30,7 +30,7 @@ impl Deck {
 
   pub fn deal_one(&mut self, face_up: bool) -> Card {
     if self.cards.len() == 0 {
-      self.cards = make_cards(self.initial_values.clone());
+      self.cards = make_cards(&self.initial_values);
     }
 
     let mut card = self.cards.pop().unwrap();
@@ -43,7 +43,7 @@ impl Deck {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Card {
   pub val: u32,
   face: String,

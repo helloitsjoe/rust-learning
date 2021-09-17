@@ -73,12 +73,12 @@ impl Game {
     );
   }
 
-  fn compare_player_dealer(&self) -> PlayerState {
+  fn compare_player_dealer(&self) -> &PlayerState {
     if self.dealer.total > 21 || (self.player.total <= 21 && self.player.total > self.dealer.total)
     {
-      PlayerState::Won
+      &PlayerState::Won
     } else if self.dealer.total > self.player.total {
-      PlayerState::Lost
+      &PlayerState::Lost
     } else {
       self.player.get_state()
     }
