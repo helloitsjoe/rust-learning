@@ -1,5 +1,3 @@
-use std::env;
-
 mod blackjack;
 
 use blackjack::game::Game;
@@ -7,16 +5,21 @@ use blackjack::input::Input;
 
 // TODO: Use a CLI argument parser
 fn main() {
-    let args_with_fn = env::args().collect::<Vec<String>>();
-    // Remove function from args
-    let args = &args_with_fn[1..];
+    let mut args = std::env::args().skip(1);
 
     if args.len() == 0 {
         handle_user_input();
     } else {
-        for arg in args {
-            println!("{}", arg);
-            println!("Currently doesn't support args. Run this program without args.");
+        let arg = args.next().unwrap();
+        if arg == "blackjack" {
+            let mut input = Input::new(Vec::new());
+            let mut game = Game::new(None);
+            game.start(&mut input);
+        } else {
+            for arg in args {
+                println!("{}", arg);
+            }
+            println!("Only blackjack for now!");
         }
     }
 }
