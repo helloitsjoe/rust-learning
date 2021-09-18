@@ -86,7 +86,7 @@ impl Player {
     self.play(deck);
   }
 
-  fn score_cards(&self, cards: &Vec<Card>) -> u32 {
+  fn score_cards(&self, cards: &[Card]) -> u32 {
     let sum_aces_11 = cards.into_iter().fold(0, |sum, card| card.val + sum);
 
     let total = cards.into_iter().fold(sum_aces_11, score_aces);

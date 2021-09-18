@@ -2,8 +2,9 @@
 - [x] Shuffle
 - [x] Aces
 - [x] Face cards worth 10
+- [ ] Bank
 - [ ] Gameplay
-  - [ ] Player input
+  - [x] Player input
     - [x] Dealer play after player stands
   - [x] DI input for tests
   - [x] Dealer play
@@ -12,4 +13,4 @@
   - [ ] Split
   - [ ] Tie
 - [x] Keep score
-- [ ] Test lifetimes with &str instead of String
+- [x] Test lifetimes with &str instead of String

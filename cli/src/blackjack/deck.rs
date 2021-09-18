@@ -7,7 +7,7 @@ pub struct Deck {
   initial_values: Vec<u32>,
 }
 
-fn make_cards(nums: &Vec<u32>) -> Vec<Card> {
+fn make_cards(nums: &[u32]) -> Vec<Card> {
   nums.iter().map(|&n| Card::new(n)).collect::<Vec<Card>>()
 }
 

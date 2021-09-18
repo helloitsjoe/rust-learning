@@ -1,13 +1,17 @@
 use std::io;
 
-#[derive(Clone)]
 pub struct Input {
   pub mock_responses: Vec<String>,
   pub is_mock: bool,
 }
 
 impl Input {
-  pub fn new(mock_responses: Vec<String>) -> Input {
+  pub fn new(mock_responses: Vec<&str>) -> Input {
+    let mock_responses = mock_responses
+      .iter()
+      .map(|&res| String::from(res))
+      .collect::<Vec<String>>();
+
     let is_mock = mock_responses.len() > 0;
     Input {
       mock_responses,

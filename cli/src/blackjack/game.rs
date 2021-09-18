@@ -38,8 +38,8 @@ impl Game {
         self.show_score();
 
         match self.player.get_state() {
-          PlayerState::Bust => println!("Bust, you lose!"),
           PlayerState::Playing => self.handle_input(input),
+          PlayerState::Bust => println!("Bust, you lose!"),
           PlayerState::Blackjack => println!("Blackjack!"),
           _ => println!("Shouldn't get here"),
         }
@@ -56,10 +56,9 @@ impl Game {
         match state {
           PlayerState::Bust => println!("Bust, you lose!"),
           PlayerState::Lost => println!("You lose!"),
-          PlayerState::Stand => println!("Stand"),
           PlayerState::Won => println!("You win!"),
-          PlayerState::Playing => println!("Shouldn't get here!"),
           PlayerState::Blackjack => println!("Blackjack!"),
+          _ => println!("Shouldn't get here!"),
         }
       }
     }
@@ -89,7 +88,7 @@ impl Game {
 fn new_game() {
   let deck = Deck::new(None);
   let game = &mut Game::new(Some(deck));
-  game.start(&mut Input::new(Vec::from([String::from("stay")])));
+  game.start(&mut Input::new(vec!["stay"]));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 2);
   assert!(game.dealer.hand.len() >= 2);
@@ -101,7 +100,7 @@ fn player_hit() {
   let cards = vec![4, 3, 2, 2];
   let deck = Deck::new(Some(cards));
   let game = &mut Game::new(Some(deck));
-  game.start(&mut Input::new(Vec::from([String::from("hit")])));
+  game.start(&mut Input::new(vec!["hit"]));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 3);
   assert!(game.dealer.hand.len() >= 2);
@@ -113,10 +112,7 @@ fn player_hit_twice() {
   let cards = vec![4, 3, 2, 2];
   let deck = Deck::new(Some(cards));
   let game = &mut Game::new(Some(deck));
-  game.start(&mut Input::new(Vec::from([
-    String::from("hit"),
-    String::from("hit"),
-  ])));
+  game.start(&mut Input::new(vec!["hit", "hit"]));
   assert_eq!(game.num_players, 1);
   assert_eq!(game.player.hand.len(), 4);
   assert!(game.dealer.hand.len() >= 2);
