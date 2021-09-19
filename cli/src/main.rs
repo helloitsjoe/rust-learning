@@ -1,7 +1,10 @@
 mod blackjack;
+mod server;
 
 use blackjack::game::Game;
 use blackjack::input::Input;
+
+use server::server::*;
 
 // TODO: Use a CLI argument parser
 fn main() {
@@ -15,6 +18,9 @@ fn main() {
             let mut input = Input::new(Vec::new());
             let mut game = Game::new(None);
             game.start(&mut input);
+        } else if arg == "server" {
+            let server = Server::new();
+            server.listen(7878);
         } else {
             for arg in args {
                 println!("{}", arg);
@@ -27,6 +33,7 @@ fn main() {
 fn handle_user_input() {
     println!("What would you like to do?");
     println!("1 - Blackjack (default)");
+    println!("2 - Server");
 
     // This is one way to do mock-able input.
     // Another way is to inject the io directly: https://stackoverflow.com/a/28370712/8852158
@@ -36,6 +43,9 @@ fn handle_user_input() {
     if user_input == "1" || user_input == "" {
         let mut game = Game::new(None);
         game.start(&mut input);
+    } else if user_input == "2" {
+        let server = Server::new();
+        server.listen(7878);
     } else {
         println!("You input: {}", user_input);
     }
