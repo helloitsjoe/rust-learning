@@ -34,13 +34,12 @@ impl ThreadPool {
   where
     F: FnOnce() + Send + 'static,
   {
-    // TODO
+    let job = Box::new(func);
+    self.sender.send(job).unwrap();
   }
 }
 
-struct Job {
-  //
-}
+type Job = Box<dyn FnOnce() + Send + 'static>;
 
 struct Worker {
   id: usize,
@@ -49,8 +48,15 @@ struct Worker {
 
 impl Worker {
   fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
-    let thread = thread::spawn(|| {
-      receiver;
+    let thread = thread::spawn(move || loop {
+      // lock() acquires the mutex, first unwrap panics on any errors.
+      // recv() receives a Job from the channel, unwrap panics on any errors.
+      // recv() blocks, so current thread will wait until a Job is available.
+      // Mutex ensures only one Worker at a time is trying to request a job.
+      // TODO: How does the Mutex do that?
+      let job = receiver.lock().unwrap().recv().unwrap();
+      println!("Worker {} got a job. Executing...", id);
+      job();
     });
     Worker { id, thread }
   }
