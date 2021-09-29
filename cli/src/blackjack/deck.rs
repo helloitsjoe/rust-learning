@@ -29,11 +29,11 @@ impl Deck {
   }
 
   pub fn deal_one(&mut self, face_up: bool) -> Card {
-    if self.cards.len() == 0 {
+    let mut card = self.cards.pop().unwrap_or_else(|| {
+      println!("Shuffling new deck...");
       self.cards = make_cards(&self.initial_values);
-    }
-
-    let mut card = self.cards.pop().unwrap();
+      self.cards.pop().expect("cards should never be empty")
+    });
 
     if face_up {
       card.reveal();
