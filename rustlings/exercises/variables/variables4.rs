@@ -2,6 +2,6 @@
 // Make me compile! Execute the command `rustlings hint variables4` if you want a hint :)
 
 fn main() {
-    let x: i32 = 4;
+    let x: i32 = 3;
     println!("Number {}", x);
 }

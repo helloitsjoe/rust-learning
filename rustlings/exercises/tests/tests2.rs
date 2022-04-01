@@ -6,6 +6,6 @@
 mod tests {
     #[test]
     fn you_can_assert_eq() {
-        assert_eq!("foo", "foo");
+        assert_eq!(vec![1, 2], vec![1, 2]);
     }
 }

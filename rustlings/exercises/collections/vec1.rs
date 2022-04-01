@@ -5,8 +5,8 @@
 // Execute the command `rustlings hint vec1` if you need hints.
 
 fn array_and_vec() -> ([i32; 4], Vec<i32>) {
-    let a = [10, 20, 30, 40];
-    let v = Vec::from(a);
+    let a = [10, 20, 30, 40]; // a plain array
+    let v = vec![10, 20, 30, 40];
 
     (a, v)
 }

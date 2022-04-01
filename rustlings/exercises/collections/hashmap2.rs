@@ -21,8 +21,6 @@ enum Fruit {
     Mango,
     Lychee,
     Pineapple,
-    Strawberry,
-    Kiwi,
 }
 
 fn fruit_basket(basket: &mut HashMap<Fruit, u32>) {
@@ -32,15 +30,13 @@ fn fruit_basket(basket: &mut HashMap<Fruit, u32>) {
         Fruit::Mango,
         Fruit::Lychee,
         Fruit::Pineapple,
-        Fruit::Strawberry,
-        Fruit::Kiwi,
     ];
 
     for fruit in fruit_kinds {
-        // if basket.get(&fruit) <= Some(&0) {
-        //     basket.insert(fruit, 3);
-        // }
-        basket.entry(fruit).or_insert(3);
+        if basket.contains_key(&fruit) {
+            continue;
+        }
+        basket.insert(fruit, 4);
     }
 }
 

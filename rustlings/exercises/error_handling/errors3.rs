@@ -4,10 +4,9 @@
 // Why not? What should we do to fix it?
 // Execute `rustlings hint errors3` for hints!
 
-use std::error::Error;
 use std::num::ParseIntError;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), ParseIntError> {
     let mut tokens = 100;
     let pretend_user_input = "8";
 
@@ -19,6 +18,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         tokens -= cost;
         println!("You now have {} tokens.", tokens);
     }
+
     Ok(())
 }
 

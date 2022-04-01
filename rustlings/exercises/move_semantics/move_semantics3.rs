@@ -4,7 +4,7 @@
 // Execute `rustlings hint move_semantics3` for hints :)
 
 fn main() {
-    let vec0 = Vec::new();
+    let mut vec0 = Vec::new();
 
     let mut vec1 = fill_vec(vec0);
 

@@ -11,14 +11,13 @@
 // you can do this!
 
 trait AppendBar {
-    fn append_bar(self) -> Self;
+    fn append_bar(&mut self) -> Self;
 }
 
 impl AppendBar for Vec<String> {
-    fn append_bar(mut self) -> Self {
-        // let mut copy = self.clone();
-        self.push(String::from("Bar"));
-        self
+    fn append_bar(&mut self) -> Self {
+        self.append(&mut vec![String::from("Bar")]);
+        self.to_vec()
     }
 }
 
