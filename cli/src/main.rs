@@ -3,12 +3,18 @@ mod server;
 
 use blackjack::game::Game;
 use blackjack::input::Input;
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+struct Cli {
+    arg: String,
+}
 
 use server::server::*;
 
 fn main() {
-    let mut args = std::env::args().skip(1);
-    let arg = args.next().unwrap_or_else(|| handle_user_input());
+    let args = Cli::try_parse().unwrap_or_else(|_| handle_user_input());
+    let arg = args.arg;
 
     if arg == "blackjack" {
         let mut input = Input::new(Vec::new());
@@ -22,7 +28,7 @@ fn main() {
     }
 }
 
-fn handle_user_input() -> String {
+fn handle_user_input() -> Cli {
     println!("What would you like to do?");
     println!("1 - Blackjack (default)");
     println!("2 - Server");
@@ -33,11 +39,15 @@ fn handle_user_input() -> String {
     let user_input = input.get_input();
 
     if user_input == "1" || user_input == "" {
-        String::from("blackjack")
+        Cli {
+            arg: "blackjack".to_string(),
+        }
     } else if user_input == "2" {
-        String::from("server")
+        Cli {
+            arg: "server".to_string(),
+        }
     } else {
         println!("You input: {}", user_input);
-        user_input
+        Cli { arg: user_input }
     }
 }
