@@ -18,5 +18,19 @@ impl MBTA {
         let route = binding.as_str();
         println!("Route: {:?}", route);
         // Request route
+
+        let res = reqwest::blocking::get("https://api-v3.mbta.com/routes/Red");
+
+        if let Err(e) = res {
+            println!("{:?}", e.status());
+        } else {
+            let text = res.unwrap().text();
+
+            if let Err(e) = text {
+                println!("{:?}", e);
+            } else {
+                println!("{:?}", text.unwrap());
+            }
+        }
     }
 }
