@@ -1,9 +1,12 @@
 mod blackjack;
+mod input;
+mod mbta;
 mod server;
 
 use blackjack::game::Game;
-use blackjack::input::Input;
 use clap::Parser;
+use input::Input;
+use mbta::mbta::MBTA;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -23,6 +26,9 @@ fn main() {
         }
         "3" => {
             // Fetch from MBTA
+            let mut input = Input::new(Vec::new());
+            let mbta = MBTA::new();
+            mbta.start(&mut input);
         }
         _ => {
             // Blackjack for "1" and default
