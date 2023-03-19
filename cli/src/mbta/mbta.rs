@@ -16,9 +16,7 @@ impl MBTA {
     }
 
     pub async fn start(self, input: &mut Input) {
-        println!("Hi");
         let result = self.handle_input(input).await;
-        println!("{:?}", result);
         if let Err(e) = result {
             panic!("{:?}", e);
         }
@@ -29,9 +27,8 @@ impl MBTA {
         let binding = input.get_input().to_lowercase();
         let route = binding.as_str();
         println!("Route: {:?}", route);
-        // Request route
 
-        let res = reqwest::get("https://api-v3.mbta.com/routes/Red")
+        let res = reqwest::get("https://api-v3.mbta.com/routes/".to_owned() + route)
             .await?
             .text()
             .await?;

@@ -23,7 +23,7 @@ async fn main() {
     match arg.as_str() {
         "2" => {
             let server = Server::new();
-            server.listen(7878);
+            server.listen(8080);
         }
         "3" => {
             // Fetch from MBTA
