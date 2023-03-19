@@ -15,7 +15,8 @@ struct Cli {
 
 use server::server::*;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Cli::try_parse().unwrap_or_else(|_| handle_user_input());
     let arg = args.arg;
 
@@ -28,7 +29,7 @@ fn main() {
             // Fetch from MBTA
             let mut input = Input::new(Vec::new());
             let mbta = MBTA::new();
-            mbta.start(&mut input);
+            mbta.start(&mut input).await;
         }
         _ => {
             // Blackjack for "1" and default

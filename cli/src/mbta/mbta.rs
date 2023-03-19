@@ -15,25 +15,27 @@ impl MBTA {
         MBTA {}
     }
 
-    pub fn start(self, input: &mut Input) {
+    pub async fn start(self, input: &mut Input) {
         println!("Hi");
-        let result = self.handle_input(input);
+        let result = self.handle_input(input).await;
         println!("{:?}", result);
         if let Err(e) = result {
             panic!("{:?}", e);
         }
     }
 
-    pub fn handle_input(self, input: &mut Input) -> Result<(), Box<dyn Error>> {
+    pub async fn handle_input(self, input: &mut Input) -> Result<(), Box<dyn Error>> {
         println!("Please enter a route");
         let binding = input.get_input().to_lowercase();
         let route = binding.as_str();
         println!("Route: {:?}", route);
         // Request route
 
-        let res = reqwest::blocking::get("https://api-v3.mbta.com/routes/Red")?.text()?;
+        let res = reqwest::get("https://api-v3.mbta.com/routes/Red")
+            .await?
+            .text()
+            .await?;
 
-        println!("{:?}", res);
         let json: MbtaResponse = serde_json::from_str(res.as_str())?;
 
         println!("{:#?}", json.data);
