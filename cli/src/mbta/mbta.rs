@@ -15,7 +15,7 @@ struct RouteData {
     attributes: RouteAttrs,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct RouteResponse {
     data: RouteData,
 }
@@ -38,17 +38,24 @@ struct StopsResponse {
 
 #[derive(Deserialize, Debug)]
 struct PredictionsAttrs {
-    departure_time: String,
+    departure_time: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
 struct PredictionsData {
     attributes: PredictionsAttrs,
+    // attributes: Value,
 }
 
 #[derive(Deserialize, Debug)]
 struct PredictionsResponse {
     data: Vec<PredictionsData>,
+}
+
+const MBTA_API: &str = "https://api-v3.mbta.com";
+
+async fn fetch_mbta<T: for<'de> Deserialize<'de>>(url: String) -> Result<T, reqwest::Error> {
+    reqwest::get(url).await?.json::<T>().await
 }
 
 impl MBTA {
@@ -65,15 +72,13 @@ impl MBTA {
 
     pub async fn handle_input(self, input: &mut Input) -> Result<(), Box<dyn Error>> {
         println!("Please enter a route:");
-        let route = input.get_input().to_lowercase();
+        let route = input.get_input();
         // println!("Route: {:?}", route);
 
-        let directions = reqwest::get(format!("https://api-v3.mbta.com/routes/{}", &route))
-            .await?
-            .json::<RouteResponse>()
-            .await?;
+        // TODO: Handle route capitalization
+        let directions = fetch_mbta::<RouteResponse>(format!("{MBTA_API}/routes/{route}")).await?;
 
-        // println!("{:?}", res);
+        println!("{:?}", directions);
 
         println!("Choose a direction:");
         for (i, dest) in directions
@@ -90,12 +95,9 @@ impl MBTA {
         let direction = direction - 1;
         // println!("Direction: {:?}", direction);
 
-        let stops = reqwest::get(format!(
-            "https://api-v3.mbta.com/stops?filter[route]={}&filter[direction_id]={}",
-            &route, direction
+        let stops = fetch_mbta::<StopsResponse>(format!(
+            "{MBTA_API}/stops?filter[route]={route}&filter[direction_id]={direction}"
         ))
-        .await?
-        .json::<StopsResponse>()
         .await?;
 
         // println!("Stops: {:?}", stops);
@@ -110,18 +112,18 @@ impl MBTA {
         let stop_id = stops.data[stop_idx].id.clone();
         // println!("{:?}", stop_id);
 
-        let predictions = reqwest::get(format!(
-            "https://api-v3.mbta.com/predictions?filter[stop]={}",
-            stop_id
+        let predictions = fetch_mbta::<PredictionsResponse>(format!(
+            "{MBTA_API}/predictions?filter[stop]={stop_id}&filter[route]={route}&filter[direction_id]={direction}",
         ))
-        .await?
-        .json::<PredictionsResponse>()
         .await?;
 
+        // TODO: Parse dates
         println!("Next departures at:");
         for prediction in predictions.data.iter() {
-            // TODO: Handle null values
-            println!("{}", prediction.attributes.departure_time);
+            let departure_time = &prediction.attributes.departure_time;
+            if let Some(dep_time) = departure_time {
+                println!("{}", dep_time);
+            }
         }
 
         // println!("{:#?}", predictions.data);
