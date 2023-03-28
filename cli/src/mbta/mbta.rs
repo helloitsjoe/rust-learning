@@ -1,4 +1,5 @@
 use super::super::Input;
+use chrono::prelude::*;
 use serde::Deserialize;
 use serde_json::Value;
 use std::error::Error;
@@ -73,7 +74,6 @@ impl MBTA {
     pub async fn handle_input(self, input: &mut Input) -> Result<(), Box<dyn Error>> {
         println!("Please enter a route:");
         let route = input.get_input();
-        // println!("Route: {:?}", route);
 
         // TODO: Handle route capitalization
         let directions = fetch_mbta::<RouteResponse>(format!("{MBTA_API}/routes/{route}")).await?;
@@ -92,11 +92,10 @@ impl MBTA {
         }
 
         let direction: u32 = input.get_input().parse()?;
-        let direction = direction - 1;
-        // println!("Direction: {:?}", direction);
+        let direction_id = direction - 1;
 
         let stops = fetch_mbta::<StopsResponse>(format!(
-            "{MBTA_API}/stops?filter[route]={route}&filter[direction_id]={direction}"
+            "{MBTA_API}/stops?filter[route]={route}&filter[direction_id]={direction_id}"
         ))
         .await?;
 
@@ -110,7 +109,6 @@ impl MBTA {
         let stop: u32 = input.get_input().parse()?;
         let stop_idx = (stop - 1) as usize;
         let stop_id = stops.data[stop_idx].id.clone();
-        // println!("{:?}", stop_id);
 
         let predictions = fetch_mbta::<PredictionsResponse>(format!(
             "{MBTA_API}/predictions?filter[stop]={stop_id}&filter[route]={route}&filter[direction_id]={direction}",
@@ -122,7 +120,10 @@ impl MBTA {
         for prediction in predictions.data.iter() {
             let departure_time = &prediction.attributes.departure_time;
             if let Some(dep_time) = departure_time {
-                println!("{}", dep_time);
+                println!("{:?}", dep_time);
+                // let dt = Utc.with_ymd_and_hms(dep_time).unwrap();
+                let parsed = DateTime::parse_from_rfc3339(dep_time).unwrap();
+                println!("{:?}", parsed.format("%H:%M").to_string());
             }
         }
 

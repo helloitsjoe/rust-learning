@@ -1,3 +1,4 @@
+mod axum_server;
 mod blackjack;
 mod input;
 mod mbta;
@@ -13,8 +14,6 @@ struct Cli {
     arg: String,
 }
 
-use server::server::*;
-
 #[tokio::main]
 async fn main() {
     let args = Cli::try_parse().unwrap_or_else(|_| handle_user_input());
@@ -22,8 +21,7 @@ async fn main() {
 
     match arg.as_str() {
         "2" => {
-            let server = Server::new();
-            server.listen(8080);
+            axum_server::server::AxumServer::new(8080).await;
         }
         "3" => {
             // Fetch from MBTA
