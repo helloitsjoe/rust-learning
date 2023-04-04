@@ -3,6 +3,14 @@ use std::net::SocketAddr;
 
 pub struct AxumServer {}
 
+// query params
+// sub routes
+// headers
+// middleware/auth
+// cors
+// status codes
+// post body
+
 impl AxumServer {
     pub async fn new(port: u16) -> AxumServer {
         let app = Router::new().route("/", get(root));
