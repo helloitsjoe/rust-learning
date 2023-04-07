@@ -13,7 +13,9 @@ pub struct AxumServer {}
 
 impl AxumServer {
     pub async fn new(port: u16) -> AxumServer {
-        let app = Router::new().route("/", get(root));
+        let app = Router::new()
+            .route("/", get(root))
+            .route("/about", get(about));
 
         let addr = SocketAddr::from(([127, 0, 0, 1], port));
         println!("Listening on http://{}", addr);
@@ -28,4 +30,8 @@ impl AxumServer {
 
 async fn root() -> Html<&'static str> {
     Html("<h1>Hello World!</h1>")
+}
+
+async fn about() -> Html<&'static str> {
+    Html("<h1>About me!</h1>")
 }
