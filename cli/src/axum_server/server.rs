@@ -37,7 +37,6 @@ async fn about() -> Html<&'static str> {
     Html("<h1>About me!</h1>")
 }
 
-async fn user(Path(id): Path<u64>) -> Html<&'static str> {
-    println!("{}", id);
-    Html("<h1>User</h1>")
+async fn user(Path(id): Path<u64>) -> Html<String> {
+    Html(format!("<h1>User {}</h1>", id))
 }
