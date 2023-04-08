@@ -1,4 +1,4 @@
-use axum::{response::Html, routing::get, Router};
+use axum::{extract::Path, response::Html, routing::get, Router};
 use std::net::SocketAddr;
 
 pub struct AxumServer {}
@@ -15,7 +15,8 @@ impl AxumServer {
     pub async fn new(port: u16) -> AxumServer {
         let app = Router::new()
             .route("/", get(root))
-            .route("/about", get(about));
+            .route("/about", get(about))
+            .route("/user/:id", get(user));
 
         let addr = SocketAddr::from(([127, 0, 0, 1], port));
         println!("Listening on http://{}", addr);
@@ -34,4 +35,9 @@ async fn root() -> Html<&'static str> {
 
 async fn about() -> Html<&'static str> {
     Html("<h1>About me!</h1>")
+}
+
+async fn user(Path(id): Path<u64>) -> Html<&'static str> {
+    println!("{}", id);
+    Html("<h1>User</h1>")
 }
