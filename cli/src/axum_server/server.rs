@@ -1,4 +1,9 @@
-use axum::{extract::Path, response::Html, routing::get, Router};
+use axum::{
+    extract::{Path, Query},
+    response::Html,
+    routing::get,
+    Router,
+};
 use std::net::SocketAddr;
 
 pub struct AxumServer {}
@@ -33,10 +38,11 @@ async fn root() -> Html<&'static str> {
     Html("<h1>Hello World!</h1>")
 }
 
-async fn about() -> Html<&'static str> {
-    Html("<h1>About me!</h1>")
+async fn about(likes: Query<String>) -> Html<&'static str> {
+    let likes = likes.split(",");
+    Html("<div><h1>About me!</h1>")
 }
 
-async fn user(Path(id): Path<u64>) -> Html<String> {
+async fn user(Path(id): Path<String>) -> Html<String> {
     Html(format!("<h1>User {}</h1>", id))
 }
