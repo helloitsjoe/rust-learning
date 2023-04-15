@@ -3,6 +3,7 @@ mod blackjack;
 mod input;
 mod mbta;
 mod server;
+mod tide_server;
 
 use blackjack::game::Game;
 use clap::Parser;
@@ -21,7 +22,9 @@ async fn main() {
 
     match arg.as_str() {
         "2" => {
-            axum_server::server::AxumServer::new(8080).await;
+            // axum_server::server::AxumServer::new(8080).await;
+            tide_server::server::TideServer::start(8080).await;
+            println!("Listening");
         }
         "3" => {
             // Fetch from MBTA
