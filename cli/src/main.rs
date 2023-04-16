@@ -15,7 +15,8 @@ struct Cli {
     arg: String,
 }
 
-#[tokio::main]
+// #[tokio::main]
+#[async_std::main]
 async fn main() {
     let args = Cli::try_parse().unwrap_or_else(|_| handle_user_input());
     let arg = args.arg;
