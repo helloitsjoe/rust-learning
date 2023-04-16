@@ -15,17 +15,18 @@ struct Cli {
     arg: String,
 }
 
-// #[tokio::main]
-#[async_std::main]
+// Tide may not work with tokio, but so haven't run into issues
+// #[async_std::main]
+#[tokio::main]
 async fn main() {
     let args = Cli::try_parse().unwrap_or_else(|_| handle_user_input());
     let arg = args.arg;
 
     match arg.as_str() {
         "2" => {
-            // axum_server::server::AxumServer::new(8080).await;
-            tide_server::server::TideServer::start(8080).await;
-            println!("Listening");
+            let mut input = Input::new(Vec::new());
+            let mut game = Game::new(None);
+            game.start(&mut input);
         }
         "3" => {
             // Fetch from MBTA
@@ -34,18 +35,21 @@ async fn main() {
             mbta.start(&mut input).await;
         }
         _ => {
-            // Blackjack for "1" and default
-            let mut input = Input::new(Vec::new());
-            let mut game = Game::new(None);
-            game.start(&mut input);
+            // Server for "1" and default
+
+            // axum_server::server::AxumServer::new(8080).await;
+            let result = tide_server::server::TideServer::start(8080).await;
+            if let Err(r) = result {
+                println!("{:?}", r);
+            }
         }
     }
 }
 
 fn handle_user_input() -> Cli {
     println!("What would you like to do?");
-    println!("1 - Blackjack (default)");
-    println!("2 - Server");
+    println!("1 - Server (default)");
+    println!("2 - Blackjack");
     println!("3 - MBTA");
 
     // This is one way to do mock-able input.

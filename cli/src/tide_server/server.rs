@@ -12,11 +12,15 @@ pub struct TideServer {}
 impl TideServer {
     pub async fn start(port: u16) -> tide::Result<()> {
         let mut app = tide::new();
-        println!("Hello");
-        app.at("/shoes").post(order_shoes);
-        println!("Hello Two");
-        app.listen("127.0.0.1:8080").await?;
-        println!("Now listening on port {}", port);
+        app.at("/shoes")
+            .get(|_| async { Ok("Hello!") })
+            .post(order_shoes);
+
+        let mut listener = app.bind(format!("127.0.0.1:{}", port)).await?;
+        for info in listener.info().iter() {
+            println!("Now listening on {}", info);
+        }
+        listener.accept().await?;
         Ok(())
     }
 }
