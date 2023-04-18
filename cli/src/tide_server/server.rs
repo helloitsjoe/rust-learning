@@ -1,6 +1,8 @@
 use tide::prelude::*;
 use tide::Request;
 
+// use http::headers::HeaderValue;
+
 #[derive(Debug, Deserialize)]
 struct Animal {
     name: String,
@@ -9,7 +11,6 @@ struct Animal {
 
 pub struct TideServer {}
 
-// query params
 // sub routes
 // headers
 // middleware/auth
@@ -23,9 +24,7 @@ impl TideServer {
         app.at("/")
             .get(|_| async { Ok(tide::Redirect::new("/shoes")) });
 
-        app.at("/shoes")
-            .get(|_| async { Ok("Order some shoes with a post request! Give it a name and how may legs you have.") })
-            .post(order_shoes);
+        app.at("/shoes").get(hello).post(order_shoes);
 
         let mut listener = app.bind(format!("127.0.0.1:{}", port)).await?;
 
@@ -38,7 +37,27 @@ impl TideServer {
     }
 }
 
+async fn hello(req: Request<()>) -> tide::Result {
+    let name = req.param("name").unwrap_or("Anonymous");
+    Ok(format!(
+        "Hello, {}! Order some shoes with a post request! Just let me know how may legs you have.",
+        name
+    )
+    .into())
+}
+
 async fn order_shoes(mut req: Request<()>) -> tide::Result {
     let Animal { name, legs } = req.body_json().await?;
-    Ok(format!("Hello, {}! I've placed an order for {} shoes.", name, legs).into())
+    // Having some trouble typing unwrap_or("default")
+    let foo_header = req.header("x-foo").unwrap();
+
+    let response = tide::Response::builder(200)
+        .header("x-foo-response", foo_header)
+        .body(format!(
+            "Hello, {}! I've placed an order for {} shoes.",
+            name, legs
+        ))
+        .build();
+
+    Ok(response)
 }

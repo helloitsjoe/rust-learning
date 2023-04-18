@@ -21,7 +21,7 @@ impl Game {
 
     pub fn start(&mut self, input: &mut Input) {
         println!("Let's play! {} players", self.num_players);
-        &mut self.deck.shuffle();
+        let _ = &mut self.deck.shuffle();
         // TODO: Should deal alternately to player/dealer
         self.player.deal(&mut self.deck);
         self.dealer.deal(&mut self.deck);
