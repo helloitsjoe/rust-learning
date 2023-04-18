@@ -46,13 +46,28 @@ async fn hello(req: Request<()>) -> tide::Result {
     .into())
 }
 
+#[derive(Deserialize)]
+#[serde(default)]
+struct Headers {
+    foo: String,
+}
+
+impl Default for Headers {
+    fn default() -> Self {
+        Self {
+            foo: "default".to_string(),
+        }
+    }
+}
+
 async fn order_shoes(mut req: Request<()>) -> tide::Result {
     let Animal { name, legs } = req.body_json().await?;
     // Having some trouble typing unwrap_or("default")
-    let foo_header = req.header("x-foo").unwrap();
+    let Headers { foo } = req.header_values();
+    // let foo_header = req.header("x-foo").unwrap();
 
     let response = tide::Response::builder(200)
-        .header("x-foo-response", foo_header)
+        .header("x-foo-response", foo)
         .body(format!(
             "Hello, {}! I've placed an order for {} shoes.",
             name, legs
