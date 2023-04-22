@@ -1,3 +1,4 @@
+use http_types::headers::HeaderValues;
 use tide::prelude::*;
 use tide::Request;
 
@@ -15,8 +16,6 @@ pub struct TideServer {}
 // headers
 // middleware/auth
 // cors
-// status codes
-// post body
 
 impl TideServer {
     pub async fn start(port: u16) -> tide::Result<()> {
@@ -46,28 +45,15 @@ async fn hello(req: Request<()>) -> tide::Result {
     .into())
 }
 
-#[derive(Deserialize)]
-#[serde(default)]
-struct Headers {
-    foo: String,
-}
-
-impl Default for Headers {
-    fn default() -> Self {
-        Self {
-            foo: "default".to_string(),
-        }
-    }
-}
-
 async fn order_shoes(mut req: Request<()>) -> tide::Result {
     let Animal { name, legs } = req.body_json().await?;
     // Having some trouble typing unwrap_or("default")
-    let Headers { foo } = req.header_values();
-    // let foo_header = req.header("x-foo").unwrap();
+    // let Headers { foo } = req.header_values();
+    // let foo = req.header("x-foo").unwrap_or_default().to_string();
+    // let maybe_foo = req.header("x-foo");
 
     let response = tide::Response::builder(200)
-        .header("x-foo-response", foo)
+        .header("x-foo-response", "bar")
         .body(format!(
             "Hello, {}! I've placed an order for {} shoes.",
             name, legs
