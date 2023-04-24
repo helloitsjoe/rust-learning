@@ -1,8 +1,7 @@
-use http_types::headers::HeaderValues;
 use tide::prelude::*;
 use tide::Request;
 
-// use http::headers::HeaderValue;
+use super::middleware::Auth;
 
 #[derive(Debug, Deserialize)]
 struct Animal {
@@ -20,10 +19,14 @@ pub struct TideServer {}
 impl TideServer {
     pub async fn start(port: u16) -> tide::Result<()> {
         let mut app = tide::new();
+
+        app.with(Auth::new());
+
         app.at("/")
             .get(|_| async { Ok(tide::Redirect::new("/shoes")) });
 
         app.at("/shoes").get(hello).post(order_shoes);
+        // app.at("/secure").with(Auth::new()).get(hello);
 
         let mut listener = app.bind(format!("127.0.0.1:{}", port)).await?;
 
