@@ -6,7 +6,7 @@ use super::middleware::Auth;
 #[derive(Debug, Deserialize)]
 struct Animal {
     name: String,
-    legs: u8,
+    legs: Option<u8>,
 }
 
 pub struct TideServer {}
@@ -20,13 +20,11 @@ impl TideServer {
     pub async fn start(port: u16) -> tide::Result<()> {
         let mut app = tide::new();
 
-        app.with(Auth::new());
-
         app.at("/")
             .get(|_| async { Ok(tide::Redirect::new("/shoes")) });
 
         app.at("/shoes").get(hello).post(order_shoes);
-        // app.at("/secure").with(Auth::new()).get(hello);
+        app.at("/secure").with(Auth::new()).get(hello);
 
         let mut listener = app.bind(format!("127.0.0.1:{}", port)).await?;
 
@@ -50,6 +48,15 @@ async fn hello(req: Request<()>) -> tide::Result {
 
 async fn order_shoes(mut req: Request<()>) -> tide::Result {
     let Animal { name, legs } = req.body_json().await?;
+
+    // TODO: Type validation
+    if legs.is_none() {
+        let response = tide::Response::builder(422)
+            .body("Legs must be provided")
+            .build();
+        return Ok(response);
+    }
+
     // Having some trouble typing unwrap_or("default")
     // let Headers { foo } = req.header_values();
     // let foo = req.header("x-foo").unwrap_or_default().to_string();
@@ -58,8 +65,9 @@ async fn order_shoes(mut req: Request<()>) -> tide::Result {
     let response = tide::Response::builder(200)
         .header("x-foo-response", "bar")
         .body(format!(
-            "Hello, {}! I've placed an order for {} shoes.",
-            name, legs
+            "Hello, {}! I've placed an order for {:?} shoes.",
+            name,
+            legs.unwrap_or(0)
         ))
         .build();
 
