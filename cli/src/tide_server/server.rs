@@ -1,4 +1,6 @@
+use http_types::headers::HeaderValue;
 use tide::prelude::*;
+use tide::security::{CorsMiddleware, Origin};
 use tide::Request;
 
 use super::middleware::Auth;
@@ -19,6 +21,13 @@ pub struct TideServer {}
 impl TideServer {
     pub async fn start(port: u16) -> tide::Result<()> {
         let mut app = tide::new();
+
+        let cors = CorsMiddleware::new()
+            .allow_methods("GET, POST, OPTIONS".parse::<HeaderValue>().unwrap())
+            .allow_origin(Origin::from("*"))
+            .allow_credentials(false);
+
+        app.with(cors);
 
         app.at("/")
             .get(|_| async { Ok(tide::Redirect::new("/shoes")) });
