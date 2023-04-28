@@ -29,11 +29,12 @@ impl TideServer {
 
         app.with(cors);
 
-        app.at("/")
-            .get(|_| async { Ok(tide::Redirect::new("/shoes")) });
+        app.at("/").serve_file("resources/hello.html")?;
 
         app.at("/shoes").get(hello).post(order_shoes);
+        app.at("/hello").get(hello);
         app.at("/secure").with(Auth::new()).get(hello);
+        app.at("/user/:id").get(user);
 
         let mut listener = app.bind(format!("127.0.0.1:{}", port)).await?;
 
@@ -46,13 +47,32 @@ impl TideServer {
     }
 }
 
+#[derive(Deserialize)]
+#[serde(default)]
+struct Person {
+    name: String,
+}
+
+impl Default for Person {
+    fn default() -> Self {
+        Self {
+            name: "Anonymous".to_string(),
+        }
+    }
+}
+
 async fn hello(req: Request<()>) -> tide::Result {
-    let name = req.param("name").unwrap_or("Anonymous");
+    let person: Person = req.query()?;
     Ok(format!(
         "Hello, {}! Order some shoes with a post request! Just let me know how may legs you have.",
-        name
+        person.name
     )
     .into())
+}
+
+async fn user(req: Request<()>) -> tide::Result {
+    let id = req.param("id").unwrap();
+    Ok(format!("User {}", id).into())
 }
 
 async fn order_shoes(mut req: Request<()>) -> tide::Result {
