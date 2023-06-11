@@ -33,6 +33,7 @@ impl TideServer {
 
         app.at("/shoes").get(hello).post(order_shoes);
         app.at("/hello").get(hello);
+        app.at("/login").post(login);
         app.at("/secure").with(Auth::new()).get(hello);
         app.at("/user/:id").get(user);
 
@@ -73,6 +74,30 @@ async fn hello(req: Request<()>) -> tide::Result {
 async fn user(req: Request<()>) -> tide::Result {
     let id = req.param("id").unwrap();
     Ok(format!("User {}", id).into())
+}
+
+#[derive(Debug, Deserialize)]
+struct Login {
+    name: String,
+    password: String,
+}
+
+// #[derive(Debug, Serialize)]
+// struct LoginResponse {
+//     token: String,
+// }
+
+async fn login(mut req: Request<()>) -> tide::Result {
+    let Login { name, password } = req.body_json().await?;
+    println!("{:?}, {:?}", name, password);
+    // let loginRes = LoginResponse {
+    //     token: "logged in".to_string(),
+    // };
+    // TODO: Serialize LoginResponse
+    let response = tide::Response::builder(200)
+        .body("{\"token\":\"some-token\"}")
+        .build();
+    Ok(response)
 }
 
 async fn order_shoes(mut req: Request<()>) -> tide::Result {

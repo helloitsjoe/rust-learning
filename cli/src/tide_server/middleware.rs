@@ -28,6 +28,7 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for Auth {
             return Ok(Response::new(StatusCode::Unauthorized));
         }
 
+        // TODO: jsonwebtoken
         let token = &auth[0].as_str()["Bearer ".len()..];
         println!("Auth: {:?}", token);
         let response = next.run(req).await;

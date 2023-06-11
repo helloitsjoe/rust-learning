@@ -8,5 +8,36 @@
     <h1>Hello!</h1>
     <p>Hi from Rust</p>
     <a href="/shoes">Order shoes</a>
+    <form id="form">
+      <label>
+        Name
+        <input type="text" name="name" />
+      </label>
+      <label>
+        Password
+        <input type="password" name="password" />
+      </label>
+      <button type="submit">
+        Submit
+      </button>
+      <pre id="response"></pre>
+    </form>
+    <script>
+      document.getElementById('form').onsubmit = (e) => {
+        e.preventDefault();
+
+        const {name, password} = Object.fromEntries(new FormData(e.target));
+
+        console.log({name, password});
+        fetch('/login', {method: 'POST', body: JSON.stringify({name, password})}).then((res) => {
+          if (!res.ok) {
+            throw new Error(res.status);
+          }
+          return res.json()
+        }).then(({token}) => {
+          document.getElementById('response').innerText = `Token: ${token}`
+        })
+      }
+    </script>
   </body>
 </html>
