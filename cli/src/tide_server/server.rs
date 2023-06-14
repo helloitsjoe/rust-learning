@@ -96,12 +96,9 @@ async fn login(mut req: Request<()>) -> tide::Result {
     // TODO: Serialize LoginResponse
     let body = tide::Body::from_json(&LoginResponse {
         token: "some-token".to_string(),
-    });
-    let res = body.into_json().await?;
-    let response = tide::Response::builder(200)
-        // .body("{\"token\":\"some-token\"}")
-        .body(res)
-        .build();
+    })?;
+
+    let response = tide::Response::builder(200).body(body).build();
     Ok(response)
 }
 
