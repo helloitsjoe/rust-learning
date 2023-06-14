@@ -82,10 +82,10 @@ struct Login {
     password: String,
 }
 
-// #[derive(Debug, Serialize)]
-// struct LoginResponse {
-//     token: String,
-// }
+#[derive(Debug, Serialize)]
+struct LoginResponse {
+    token: String,
+}
 
 async fn login(mut req: Request<()>) -> tide::Result {
     let Login { name, password } = req.body_json().await?;
@@ -94,8 +94,13 @@ async fn login(mut req: Request<()>) -> tide::Result {
     //     token: "logged in".to_string(),
     // };
     // TODO: Serialize LoginResponse
+    let body = tide::Body::from_json(&LoginResponse {
+        token: "some-token".to_string(),
+    });
+    let res = body.into_json().await?;
     let response = tide::Response::builder(200)
-        .body("{\"token\":\"some-token\"}")
+        // .body("{\"token\":\"some-token\"}")
+        .body(res)
         .build();
     Ok(response)
 }
