@@ -90,13 +90,11 @@ struct LoginResponse {
 async fn login(mut req: Request<()>) -> tide::Result {
     let Login { name, password } = req.body_json().await?;
     println!("{:?}, {:?}", name, password);
-    // let loginRes = LoginResponse {
-    //     token: "logged in".to_string(),
-    // };
-    // TODO: Serialize LoginResponse
-    let body = tide::Body::from_json(&LoginResponse {
+    // TODO: JWT
+    let login_response = LoginResponse {
         token: "some-token".to_string(),
-    })?;
+    };
+    let body = tide::Body::from_json(&login_response)?;
 
     let response = tide::Response::builder(200).body(body).build();
     Ok(response)
