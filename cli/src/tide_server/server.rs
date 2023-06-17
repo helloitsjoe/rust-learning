@@ -1,7 +1,7 @@
 use http_types::headers::HeaderValue;
 use tide::prelude::*;
 use tide::security::{CorsMiddleware, Origin};
-use tide::Request;
+use tide::{Body, Request, Response};
 
 use super::middleware::Auth;
 
@@ -34,6 +34,7 @@ impl TideServer {
         app.at("/shoes").get(hello).post(order_shoes);
         app.at("/hello").get(hello);
         app.at("/login").post(login);
+        app.at("/register").post(register);
         app.at("/secure").with(Auth::new()).get(hello);
         app.at("/user/:id").get(user);
 
@@ -87,16 +88,39 @@ struct LoginResponse {
     token: String,
 }
 
+fn sign_jwt() {}
+
+fn validate_login(name: String, password: String) -> String {
+    // Check in-memory users
+    // return JWT
+    "foo".to_string()
+}
+
+async fn register(mut req: Request<()>) -> tide::Result {
+    let Login { name, password } = req.body_json().await?;
+
+    // Add new user to in-memory users
+    // return JWT
+
+    let response = Response::builder(200)
+        .body("some-token".to_string())
+        .build();
+    Ok(response)
+}
+
 async fn login(mut req: Request<()>) -> tide::Result {
     let Login { name, password } = req.body_json().await?;
     println!("{:?}, {:?}", name, password);
-    // TODO: JWT
+
+    let token = validate_login(name, password);
+
     let login_response = LoginResponse {
         token: "some-token".to_string(),
     };
-    let body = tide::Body::from_json(&login_response)?;
 
-    let response = tide::Response::builder(200).body(body).build();
+    let response = Response::builder(200)
+        .body(Body::from_json(&login_response)?)
+        .build();
     Ok(response)
 }
 
@@ -105,9 +129,7 @@ async fn order_shoes(mut req: Request<()>) -> tide::Result {
 
     // TODO: Type validation
     if legs.is_none() {
-        let response = tide::Response::builder(422)
-            .body("Legs must be provided")
-            .build();
+        let response = Response::builder(422).body("Legs must be provided").build();
         return Ok(response);
     }
 
