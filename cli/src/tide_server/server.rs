@@ -3,6 +3,7 @@ use tide::prelude::*;
 use tide::security::{CorsMiddleware, Origin};
 use tide::{Body, Request, Response};
 
+use super::jwt::sign;
 use super::middleware::Auth;
 
 #[derive(Debug, Deserialize)]
@@ -88,8 +89,6 @@ struct LoginResponse {
     token: String,
 }
 
-fn sign_jwt() {}
-
 fn validate_login(name: String, password: String) -> String {
     // Check in-memory users
     // return JWT
@@ -101,10 +100,9 @@ async fn register(mut req: Request<()>) -> tide::Result {
 
     // Add new user to in-memory users
     // return JWT
+    let token = sign(name)?;
 
-    let response = Response::builder(200)
-        .body("some-token".to_string())
-        .build();
+    let response = Response::builder(200).body(token).build();
     Ok(response)
 }
 
@@ -112,15 +110,20 @@ async fn login(mut req: Request<()>) -> tide::Result {
     let Login { name, password } = req.body_json().await?;
     println!("{:?}, {:?}", name, password);
 
-    let token = validate_login(name, password);
+    // TODO: Check name/pw against in-memory DB
 
-    let login_response = LoginResponse {
-        token: "some-token".to_string(),
-    };
+    // TODO: Move verify to auth middleware
+    // if (!verify(name, password)) {
+    //     return Ok(Response::builder(401).build());
+    // }
+
+    let token = sign(name)?;
+    let login_response = LoginResponse { token };
 
     let response = Response::builder(200)
         .body(Body::from_json(&login_response)?)
         .build();
+
     Ok(response)
 }
 
