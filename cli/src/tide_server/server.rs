@@ -36,7 +36,7 @@ impl TideServer {
         app.at("/hello").get(hello);
         app.at("/login").post(login);
         app.at("/register").post(register);
-        app.at("/secure").with(Auth::new()).get(hello);
+        app.at("/secure").with(Auth::new()).get(secure);
         app.at("/user/:id").get(user);
 
         let mut listener = app.bind(format!("127.0.0.1:{}", port)).await?;
@@ -125,6 +125,10 @@ async fn login(mut req: Request<()>) -> tide::Result {
         .build();
 
     Ok(response)
+}
+
+async fn secure(mut req: Request<()>) -> tide::Result {
+    Ok(tide::Response::builder(200).body("Authorized!").build())
 }
 
 async fn order_shoes(mut req: Request<()>) -> tide::Result {

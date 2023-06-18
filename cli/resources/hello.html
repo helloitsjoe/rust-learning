@@ -7,7 +7,6 @@
   <body>
     <h1>Hello!</h1>
     <p>Hi from Rust</p>
-    <a href="/shoes">Order shoes</a>
     <form id="form">
       <label>
         Name
@@ -20,8 +19,9 @@
       <button type="submit">
         Submit
       </button>
-      <pre id="response"></pre>
     </form>
+    <pre id="response"></pre>
+    <a href="/shoes">Order shoes</a>
     <script>
       document.getElementById('form').onsubmit = (e) => {
         e.preventDefault();
@@ -35,8 +35,39 @@
           }
           return res.json()
         }).then(({token}) => {
-          document.getElementById('response').innerText = `Token: ${token}`
+          const response = document.getElementById('response');
+
+          const tokenResponse = document.createElement('div');
+          tokenResponse.textContent =  `Token: ${token}`;
+
+          const secureResponse = document.createElement('div');
+          secureResponse.textContent = '';
+
+          const button = document.createElement('button');
+          button.textContent = 'Make a secure request';
+          button.onclick = () => {
+              fetch('/secure', {
+               headers: {Authorization: `Bearer ${mangleToken(token)}`}
+            }).then((res) => {
+              if (!res.ok) {
+                return res.status
+              }
+              return res.text();
+            }).then((text) => {
+              secureResponse.innerHTML = text;
+            })
+          }
+
+          response.appendChild(tokenResponse);
+          response.appendChild(button);
+          response.appendChild(secureResponse);
         })
+      }
+
+      function mangleToken(token) {
+        const arr = token.split('.');
+        arr[2] = 'mangled';
+        return arr.join('.');
       }
     </script>
   </body>
