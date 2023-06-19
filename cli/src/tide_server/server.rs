@@ -101,8 +101,9 @@ async fn register(mut req: Request<()>) -> tide::Result {
     // Add new user to in-memory users
     // return JWT
     let token = sign(name)?;
+    let body = Body::from_json(&LoginResponse { token })?;
 
-    let response = Response::builder(200).body(token).build();
+    let response = Response::builder(200).body(body).build();
     Ok(response)
 }
 
@@ -112,22 +113,14 @@ async fn login(mut req: Request<()>) -> tide::Result {
 
     // TODO: Check name/pw against in-memory DB
 
-    // TODO: Move verify to auth middleware
-    // if (!verify(name, password)) {
-    //     return Ok(Response::builder(401).build());
-    // }
-
     let token = sign(name)?;
-    let login_response = LoginResponse { token };
+    let body = Body::from_json(&LoginResponse { token })?;
 
-    let response = Response::builder(200)
-        .body(Body::from_json(&login_response)?)
-        .build();
-
+    let response = Response::builder(200).body(body).build();
     Ok(response)
 }
 
-async fn secure(mut req: Request<()>) -> tide::Result {
+async fn secure(req: Request<()>) -> tide::Result {
     Ok(tide::Response::builder(200).body("Authorized!").build())
 }
 
