@@ -47,7 +47,7 @@
           button.textContent = 'Make a secure request';
           button.onclick = () => {
               fetch('/secure', {
-               headers: {Authorization: `Bearer ${mangleToken(token)}`}
+               headers: {Authorization: `Bearer ${token}`}
             }).then((res) => {
               if (!res.ok) {
                 return res.status

@@ -16,27 +16,30 @@ impl Auth {
 // tide-jwt - https://github.com/nyxtom/tide-jwt/blob/master/src/lib.rs
 #[async_trait::async_trait]
 impl<State: Clone + Send + Sync + 'static> Middleware<State> for Auth {
-    async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result<Response, Error> {
-        let auth_header = req.header("Authorization");
-        // println!("Auth header: {:?}", auth_header);
+    async fn handle(
+        &self,
+        mut req: Request<State>,
+        next: Next<'_, State>,
+    ) -> Result<Response, Error> {
+        return match req.header("Authorization") {
+            Some(header) => {
+                let auth: Vec<_> = header.clone().into_iter().collect();
 
-        if let Some(header) = auth_header {
-            let auth: Vec<_> = header.into_iter().collect();
-            // println!("Auth before split: {:?}", auth);
+                if auth.len() != 1 {
+                    return Ok(Response::new(StatusCode::Unauthorized));
+                }
 
-            if auth.len() != 1 {
-                return Ok(Response::new(StatusCode::Unauthorized));
+                let token = &auth[0].as_str()["Bearer ".len()..];
+                println!("Auth: {:?}", token);
+
+                req.append_header("x-token", token);
+
+                return match verify(token.to_string()) {
+                    Ok(_) => Ok(next.run(req).await),
+                    Err(_) => Ok(Response::new(StatusCode::Unauthorized)),
+                };
             }
-
-            let token = &auth[0].as_str()["Bearer ".len()..];
-            println!("Auth: {:?}", token);
-
-            return match verify(token.to_string()) {
-                Ok(_) => Ok(next.run(req).await),
-                Err(_) => Ok(Response::new(StatusCode::Unauthorized)),
-            };
-        }
-
-        return Ok(Response::new(StatusCode::Unauthorized));
+            None => Ok(Response::new(StatusCode::Unauthorized)),
+        };
     }
 }
