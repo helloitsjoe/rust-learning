@@ -8,5 +8,5 @@ use hackattic::brute_force;
 fn main() {
     dotenv().ok();
     // crack();
-    brute_force();
+    let _ = brute_force();
 }
