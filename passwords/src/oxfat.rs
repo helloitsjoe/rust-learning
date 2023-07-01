@@ -5,6 +5,11 @@ use std::thread;
 // https://0xf.at/play/20
 // Remember to cargo build --release!
 pub fn crack() {
+    // single_thread();
+    multi_thread();
+}
+
+fn multi_thread() {
     let file = fs::read_to_string("./wordlist.txt").expect("Could not read file");
     let file_words = file
         .trim()

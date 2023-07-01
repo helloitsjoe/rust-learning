@@ -1,12 +1,12 @@
 mod hackattic;
-// mod oxfat;
+mod oxfat;
 
 use dotenv::dotenv;
-use hackattic::brute_force;
-// use oxfat::crack;
+// use hackattic::brute_force;
+use oxfat::crack;
 
 fn main() {
     dotenv().ok();
-    // crack();
-    let _ = brute_force();
+    crack();
+    // let _ = brute_force();
 }
