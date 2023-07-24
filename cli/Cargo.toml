@@ -23,3 +23,5 @@ tide = "0.16"
 jwt = "0.16"
 sha2 = "0.10"
 hmac = "0.12"
+tower-http = { version = "0.4", features = ["cors"] }
+http = "0.2"

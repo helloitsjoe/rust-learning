@@ -1,7 +1,8 @@
+mod axum_server;
 mod blackjack;
 mod input;
 mod mbta;
-mod tide_server;
+// mod tide_server;
 
 use blackjack::game::Game;
 use clap::Parser;
@@ -35,8 +36,8 @@ async fn main() {
         _ => {
             // Server for "1" and default
 
-            // axum_server::server::AxumServer::new(8080).await;
-            let result = tide_server::server::TideServer::start(8080).await;
+            let result = axum_server::server::AxumServer::new(8080).await;
+            // let result = tide_server::server::TideServer::start(8080).await;
             if let Err(r) = result {
                 println!("{:?}", r);
             }

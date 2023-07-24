@@ -1,10 +1,8 @@
-use axum::{
-    extract::{Path, Query},
-    response::Html,
-    routing::get,
-    Router,
-};
+use super::handlers;
+use axum::{routing::get, Router};
+use http::Method;
 use std::net::SocketAddr;
+use tower_http::cors::{Any, CorsLayer};
 
 pub struct AxumServer {}
 
@@ -12,16 +10,25 @@ pub struct AxumServer {}
 // sub routes
 // headers
 // middleware/auth
-// cors
 // status codes
 // post body
 
 impl AxumServer {
-    pub async fn new(port: u16) -> AxumServer {
+    pub async fn new(port: u16) -> Result<AxumServer, Box<dyn std::error::Error>> {
+        let cors = CorsLayer::new()
+            .allow_origin(Any)
+            .allow_methods(vec![Method::GET, Method::POST])
+            .allow_headers(vec![
+                http::header::AUTHORIZATION,
+                http::header::ACCEPT,
+                http::header::CONTENT_TYPE,
+            ]);
+
         let app = Router::new()
-            .route("/", get(root))
-            .route("/about", get(about))
-            .route("/user/:id", get(user));
+            .layer(cors)
+            .route("/", get(handlers::root))
+            .route("/about", get(handlers::about))
+            .route("/user/:id", get(handlers::user));
 
         let addr = SocketAddr::from(([127, 0, 0, 1], port));
         println!("Listening on http://{}", addr);
@@ -30,19 +37,6 @@ impl AxumServer {
             .await
             .unwrap();
 
-        AxumServer {}
+        Ok(AxumServer {})
     }
-}
-
-async fn root() -> Html<&'static str> {
-    Html("<h1>Hello World!</h1>")
-}
-
-async fn about(likes: Query<String>) -> Html<&'static str> {
-    let likes = likes.split(",");
-    Html("<div><h1>About me!</h1>")
-}
-
-async fn user(Path(id): Path<String>) -> Html<String> {
-    Html(format!("<h1>User {}</h1>", id))
 }
