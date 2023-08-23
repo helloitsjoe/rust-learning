@@ -1,12 +1,12 @@
 use futures::future::select_all;
 use std::fs;
-use std::sync::{Arc, Mutex};
+use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 
 // https://0xf.at/play/20
 // Remember to cargo build --release!
 pub async fn crack() {
-    single_thread().await;
+    tokio_threads().await;
     // multi_thread();
 }
 
@@ -58,7 +58,7 @@ fn multi_thread() {
     }
 }
 
-async fn single_thread() {
+async fn tokio_threads() {
     let file = fs::read_to_string("./wordlist.txt").expect("Could not read file");
     let file_words = file
         .trim()
@@ -77,7 +77,8 @@ async fn single_thread() {
 
     let result = select_all(futures).await;
 
-    println!("{:?}", result);
+    println!("DONE");
+    println!("{:?}", result.0);
 }
 
 async fn do_work(words: Vec<String>, i: usize) -> Result<(), ()> {
@@ -90,6 +91,7 @@ async fn do_work(words: Vec<String>, i: usize) -> Result<(), ()> {
 
         for word2 in &words[..] {
             let digest = md5::compute(word1.to_string() + word2);
+            // TODO: Stop execution on all threads when password is found
             // if format!("{:x}", digest) == "3df7c3057e540cbe9244561a2d4345f7" {
             if format!("{:x}", digest) == "d8f8a1328020a6853495aec55990ccc9" {
                 println!("{}{}", word1, word2);
